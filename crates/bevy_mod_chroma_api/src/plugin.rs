@@ -1,24 +1,18 @@
 use bevy::{
     log::*,
     prelude::{
-        in_state, resource_exists, App, Condition, IntoSystemConfig, Local, Plugin, Res, ResMut,
-        State, States,
+        in_state, resource_exists, App, Commands, Condition, IntoSystemConfig, Local, Plugin, Res,
+        ResMut, State, States,
     },
 };
 use bevy_mod_chroma_request_lib::{HttpRequestHandle, HttpRequestPlugin, HttpRequests};
 
-use crate::{
-    api::SessionInfo, ChromaPlugin, ChromaRunner, ChromaRunnerInitializationSettings, Init,
-};
+use crate::{api::SessionInfo, ChromaPlugin, ChromaRunner, ChromaRunnerInitializationSettings};
 
 impl Plugin for ChromaPlugin {
     fn build(&self, app: &mut App) {
-        app.add_state::<RunnerState>()
-            // TODO pass in ChromaRunnerInitializationSettings when creating ChromaPlugin
-            .insert_resource(ChromaRunnerInitializationSettings {
-                init_url: "http://localhost:54235/razer/chromasdk",
-                init_request: Init::default(),
-            })
+        app.insert_resource(self.settings.clone())
+            .add_state::<RunnerState>()
             .add_plugin(HttpRequestPlugin)
             .init_resource::<ChromaRunner>()
             .add_system(
@@ -39,6 +33,7 @@ enum RunnerState {
 }
 
 fn system_init(
+    mut commands: Commands,
     mut init_request: Local<Option<HttpRequestHandle>>,
     mut requests: HttpRequests,
     mut runner_state: ResMut<State<RunnerState>>,
@@ -54,6 +49,8 @@ fn system_init(
                     .json(&init.init_request),
             ),
         );
+
+        commands.remove_resource::<ChromaRunnerInitializationSettings>();
         return;
     }
 
