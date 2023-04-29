@@ -45,7 +45,7 @@ fn system_init_error_handler(
 ) {
     if let Err(err) = result {
         runner_state.0 = RunnerState::Error;
-        println!("failed to initialize chroma runner: {:?}", err);
+        error!("failed to initialize chroma runner: {:?}", err);
     }
 }
 
