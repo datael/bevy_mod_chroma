@@ -5,6 +5,7 @@ use bevy::{
 use bytes::Bytes;
 use plugin::{HttpRequest, HttpRequestClient, HttpResponseReceived};
 use reqwest::{Client, RequestBuilder, StatusCode};
+use serde::Deserialize;
 
 mod plugin;
 
@@ -62,6 +63,13 @@ impl HttpResponse {
 
     pub fn status_code(&self) -> StatusCode {
         self.status_code
+    }
+
+    pub fn json<'de, T>(&'de self) -> Result<T, serde_json::Error>
+    where
+        T: Deserialize<'de>,
+    {
+        serde_json::from_slice(&self.body_bytes)
     }
 }
 
