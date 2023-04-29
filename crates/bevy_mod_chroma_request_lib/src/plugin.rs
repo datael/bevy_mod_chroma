@@ -5,11 +5,9 @@ use bevy::{
 use crossbeam_channel::Receiver;
 use reqwest::{Client, RequestBuilder};
 
-use crate::{HttpRequestError, HttpResponse};
+use crate::{HttpRequestError, HttpRequestPlugin, HttpResponse};
 
-pub struct RequestPlugin;
-
-impl Plugin for RequestPlugin {
+impl Plugin for HttpRequestPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<HttpRequestClient>()
             .add_system(system_execute_requests)

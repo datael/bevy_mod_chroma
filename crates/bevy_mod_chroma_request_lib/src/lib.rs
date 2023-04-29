@@ -8,6 +8,8 @@ use reqwest::{Client, RequestBuilder, StatusCode};
 
 mod plugin;
 
+pub struct HttpRequestPlugin;
+
 #[derive(SystemParam)]
 pub struct HttpRequests<'w, 's> {
     commands: Commands<'w, 's>,
