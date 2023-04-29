@@ -12,6 +12,7 @@ use crate::ChromaRunner;
 
 static HEARTBEAT_INTERVAL: f32 = 1.0;
 static HEARTBEAT_TIMEOUT: f32 = 10.0;
+static HEARTBEAT_API: &str = "/heartbeat";
 
 pub(crate) struct HeartbeatPlugin;
 
@@ -51,7 +52,7 @@ fn system_heartbeat_keepalive(
             requests.request(
                 requests
                     .client()
-                    .post(runner.get_session_url("/heartbeat"))
+                    .post(runner.get_session_url(HEARTBEAT_API))
                     .json(&HeartbeatRequest),
             ),
         ),
