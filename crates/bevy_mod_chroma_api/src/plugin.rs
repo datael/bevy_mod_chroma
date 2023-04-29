@@ -7,9 +7,9 @@ use bevy::{
 };
 use bevy_mod_chroma_request_lib::{HttpRequestHandle, HttpRequestPlugin, HttpRequests};
 
-use crate::{api::SessionInfo, ChromaRunner, ChromaRunnerInitializationSettings, Init};
-
-pub struct ChromaPlugin;
+use crate::{
+    api::SessionInfo, ChromaPlugin, ChromaRunner, ChromaRunnerInitializationSettings, Init,
+};
 
 impl Plugin for ChromaPlugin {
     fn build(&self, app: &mut App) {
