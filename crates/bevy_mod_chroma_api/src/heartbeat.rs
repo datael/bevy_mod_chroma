@@ -12,7 +12,7 @@ use crate::ChromaRunner;
 
 static HEARTBEAT_INTERVAL: f32 = 1.0;
 static HEARTBEAT_TIMEOUT: f32 = 10.0;
-static HEARTBEAT_API: &str = "/heartbeat";
+static HEARTBEAT_API: &str = "chromasdk/heartbeat";
 
 pub(crate) struct HeartbeatPlugin;
 
@@ -36,7 +36,10 @@ impl Plugin for HeartbeatPlugin {
 pub(crate) struct HeartbeatRequest;
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct HeartbeatResponse {}
+pub(crate) struct HeartbeatResponse {
+    #[serde(rename(deserialize = "tick"))]
+    _tick: u32,
+}
 
 #[derive(Resource, Default)]
 struct InFlightHeartbeatRequests(Vec<(Instant, Option<HttpRequestHandle>)>);
@@ -52,7 +55,7 @@ fn system_heartbeat_keepalive(
             requests.request(
                 requests
                     .client()
-                    .post(runner.get_session_url(HEARTBEAT_API))
+                    .put(runner.get_session_url(HEARTBEAT_API))
                     .json(&HeartbeatRequest),
             ),
         ),
