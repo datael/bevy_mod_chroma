@@ -66,7 +66,6 @@ fn system_init(
             ),
         );
 
-        commands.remove_resource::<ChromaRunnerInitializationSettings>();
         return Ok(());
     }
 
@@ -75,9 +74,10 @@ fn system_init(
         let session_info = response.as_ref()?.json::<SessionInfo>()?;
         let root_url = Url::parse(session_info.root_url.as_str())?;
 
-        commands.insert_resource(ChromaRunner { root_url });
-
         requests.dispose_option(&mut init_request);
+
+        commands.insert_resource(ChromaRunner { root_url });
+        commands.remove_resource::<ChromaRunnerInitializationSettings>();
 
         runner_state.0 = RunnerState::Running;
         info!("successfully opened chroma session");
