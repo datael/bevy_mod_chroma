@@ -71,7 +71,7 @@ fn system_heartbeat_cleanup(
     in_flight_requests
         .0
         .retain_mut(|(deadline, ref mut in_flight_request)| {
-            if deadline.elapsed() > now {
+            if deadline.elapsed() < now {
                 requests.dispose_option(in_flight_request);
                 false
             } else {
