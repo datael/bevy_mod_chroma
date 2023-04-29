@@ -43,6 +43,14 @@ impl<'w, 's> HttpRequests<'w, 's> {
     pub fn dispose(&mut self, handle: HttpRequestHandle) {
         self.commands.entity(handle.entity).despawn();
     }
+
+    pub fn dispose_option(&mut self, handle: &mut Option<HttpRequestHandle>) {
+        assert!(handle.is_some());
+
+        let mut empty_handle = None;
+        std::mem::swap(&mut empty_handle, handle);
+        self.dispose(empty_handle.unwrap());
+    }
 }
 
 #[derive(Debug)]
@@ -73,13 +81,13 @@ impl HttpResponse {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum HttpRequestError {
-    RequestFailed(reqwest::Error),
+    RequestFailed(String),
 }
 
 impl From<reqwest::Error> for HttpRequestError {
     fn from(error: reqwest::Error) -> Self {
-        Self::RequestFailed(error)
+        Self::RequestFailed(format!("{error:?}"))
     }
 }
