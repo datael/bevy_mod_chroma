@@ -4,6 +4,7 @@ use bevy::{
     log::*, prelude::*, tasks::AsyncComputeTaskPool, time::common_conditions::on_timer,
     utils::HashMap,
 };
+use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
 use crate::{bgr_color::*, request_support::*};
@@ -159,6 +160,14 @@ struct ChromaRunnerInitializationResultReceiver(
     pub crossbeam_channel::Receiver<ChromaRunnerInitializedEvent>,
 );
 
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+enum ChromaRunnerState {
+    NotStarted,
+    AwaitingInitializationResponse,
+    Running,
+    Finished,
+}
+
 #[derive(Default)]
 enum InitStage {
     #[default]
@@ -189,7 +198,7 @@ fn chroma_runner_init<T: EffectIdentifier>(
             AsyncComputeTaskPool::get()
                 .spawn(async move {
                     if let Ok(response) =
-                        post::<SessionInfo>(init_url.to_string(), init_request).await
+                        post::<SessionInfo>(init_url.parse::<Url>().unwrap(), init_request).await
                     {
                         info!("response: {:?}", response);
                         sender
@@ -235,8 +244,11 @@ impl<T: EffectIdentifier> ChromaRunner<T> {
 }
 
 impl<T: EffectIdentifier> ChromaRunner<T> {
-    fn to_full_url(&self, relative_path: &str) -> String {
-        self.root_url.clone().unwrap() + relative_path.into()
+    fn to_full_url(&self, relative_path: &str) -> Url {
+        (self.root_url.clone().unwrap() + relative_path.into())
+            .as_str()
+            .parse()
+            .unwrap()
     }
 }
 

@@ -1,4 +1,5 @@
 use bevy::log::*;
+use reqwest::Url;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -23,10 +24,14 @@ impl From<serde_json::error::Error> for RequestError {
 pub struct IgnoreContent {}
 
 pub(crate) async fn post<ResponseBody: DeserializeOwned>(
-    url: String,
+    url: impl Into<Url>,
     body: impl Serialize,
 ) -> Result<ResponseBody, RequestError> {
-    let response = reqwest::Client::new().post(url).json(&body).send().await;
+    let response = reqwest::Client::new()
+        .post(url.into())
+        .json(&body)
+        .send()
+        .await;
 
     if let Err(error) = &response {
         error!("post failed: {:?}", error);
@@ -40,10 +45,14 @@ pub(crate) async fn post<ResponseBody: DeserializeOwned>(
 }
 
 pub(crate) async fn put<ResponseBody: DeserializeOwned>(
-    url: String,
+    url: impl Into<Url>,
     body: impl Serialize,
 ) -> Result<ResponseBody, RequestError> {
-    let response = reqwest::Client::new().put(url).json(&body).send().await;
+    let response = reqwest::Client::new()
+        .put(url.into())
+        .json(&body)
+        .send()
+        .await;
 
     if let Err(error) = &response {
         error!("put failed: {:?}", error);

@@ -1,6 +1,7 @@
 mod bgr_color;
 mod chroma_runner;
 mod request_support;
+mod reqwest;
 
 use std::time::Duration;
 
