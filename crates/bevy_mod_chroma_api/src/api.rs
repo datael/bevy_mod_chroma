@@ -4,5 +4,6 @@ use serde::Deserialize;
 pub(crate) struct SessionInfo {
     #[serde(rename(deserialize = "sessionid"))]
     _session_id: u32,
-    _uri: String,
+    #[serde(rename(deserialize = "uri"))]
+    pub(crate) root_url: String,
 }
