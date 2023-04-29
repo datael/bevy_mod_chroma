@@ -54,6 +54,7 @@ fn system_init(
         return;
     }
 
+    // SAFETY: init_request is always some here as verified above
     if let Some(response) = requests.get_response(init_request.as_ref().unwrap()) {
         if let Ok(success_response) = response {
             if let Ok(session_info) = success_response.json::<SessionInfo>() {
