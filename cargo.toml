@@ -1,0 +1,29 @@
+[package]
+name = "rust-bevy-chroma"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde_json = "^1"
+serde = { version = "^1", features = [ "derive" ] }
+reqwest = { version = "^0.11", features = [ "json" ] }
+crossbeam-channel = "^0.5"
+
+[dev-dependencies.bevy]
+version = "^0.10"
+features = [ "dynamic_linking" ]
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies.bevy]
+version = "^0.10"
+features = [ "dynamic_linking" ]
+
+[target.'cfg(target_family = "wasm")'.dependencies.bevy]
+version = "^0.10"
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
