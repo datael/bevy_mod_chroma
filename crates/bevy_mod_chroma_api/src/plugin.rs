@@ -4,10 +4,12 @@ use bevy::{
         in_state, resource_exists, App, Commands, Component, Condition, Entity, In, IntoPipeSystem,
         IntoSystemConfig, Local, Plugin, Query, Res, ResMut, State, States, Without,
     },
+    utils::Instant,
 };
 use bevy_mod_chroma_request_lib::{
     HttpRequestError, HttpRequestHandle, HttpRequestPlugin, HttpRequests,
 };
+use serde::Serialize;
 
 use crate::{
     api::{CreateEffectResponse, Effect, SessionInfo},
@@ -32,7 +34,17 @@ impl Plugin for ChromaPlugin {
                     resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
                 ),
             )
-            .add_system(system_gather_create_effect_results.run_if(
+            .add_system(
+                system_gather_create_effect_results.run_if(
+                    resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
+                ),
+            )
+            .add_system(
+                system_apply_effects.run_if(
+                    resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
+                ),
+            )
+            .add_system(system_apply_effects_cleanup.run_if(
                 resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
             ));
     }
@@ -132,7 +144,7 @@ struct InFlightCreateEffectRequest {
     request_handle: Option<HttpRequestHandle>,
 }
 
-#[derive(Component)]
+#[derive(Component, Serialize)]
 struct CreatedEffect {
     id: String,
 }
@@ -190,6 +202,92 @@ fn system_gather_create_effect_results(
 
             let request_handle = in_flight_request.request_handle.take().unwrap();
             requests.dispose(request_handle);
+        }
+    }
+}
+
+#[derive(Component)]
+pub(crate) struct ApplyEffectRequest {
+    pub(crate) effect_entity: Entity,
+    pub(crate) deadline: Instant,
+}
+
+impl ApplyEffectRequest {
+    pub(crate) fn is_expired(&self) -> bool {
+        Instant::now() > self.deadline
+    }
+}
+
+#[derive(Component)]
+pub(crate) struct InFlightApplyEffectRequest {
+    request_handle: Option<HttpRequestHandle>,
+    pub(crate) deadline: Instant,
+}
+
+impl InFlightApplyEffectRequest {
+    pub(crate) fn is_expired(&self) -> bool {
+        Instant::now() > self.deadline
+    }
+}
+
+fn system_apply_effects(
+    mut commands: Commands,
+    mut requests: HttpRequests,
+    runner: Res<ChromaRunner>,
+    requests_query: Query<(Entity, &ApplyEffectRequest)>,
+    effects_query: Query<&CreatedEffect>,
+) {
+    for (entity, application_request) in requests_query.iter() {
+        if application_request.is_expired() {
+            commands.entity(entity).despawn();
+            continue;
+        }
+
+        if let Ok(created_effect) = effects_query.get(application_request.effect_entity) {
+            let request_handle = requests.request(
+                requests
+                    .client()
+                    .put(runner.get_session_url("effect"))
+                    .json(created_effect),
+            );
+
+            commands
+                .entity(entity)
+                .insert(InFlightApplyEffectRequest {
+                    request_handle: Some(request_handle),
+                    deadline: application_request.deadline,
+                })
+                .remove::<ApplyEffectRequest>();
+        }
+    }
+}
+
+fn system_apply_effects_cleanup(
+    mut commands: Commands,
+    mut requests: HttpRequests,
+    mut in_flight_requests_query: Query<(Entity, &mut InFlightApplyEffectRequest)>,
+) {
+    for (entity, mut in_flight_request) in in_flight_requests_query.iter_mut() {
+        if in_flight_request.is_expired() {
+            let request_handle = in_flight_request.request_handle.take().unwrap();
+            requests.dispose(request_handle);
+            commands.entity(entity).despawn();
+            continue;
+        }
+
+        if let Some(result) =
+            requests.get_response(in_flight_request.request_handle.as_ref().unwrap())
+        {
+            // TODO error check result body
+            if let Ok(success_result) = result {
+                info!("successfully applied effect: {:?}", success_result);
+            } else {
+                error!("failed to apply effect: {:?}", result);
+            }
+
+            let request_handle = in_flight_request.request_handle.take().unwrap();
+            requests.dispose(request_handle);
+            commands.entity(entity).despawn();
         }
     }
 }
