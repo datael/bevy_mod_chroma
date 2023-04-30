@@ -1,7 +1,12 @@
 [package]
 name = "bevy_mod_chroma"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
+keywords = [ "game", "gamedev", "bevy", "razer", "chroma" ]
+repository = "https://github.com/datael/bevy_mod_chroma"
+rust-version = "1.69.0"
+readme = "README.md"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -15,15 +20,15 @@ members = [
 bevy_mod_chroma_api = { path = "crates/bevy_mod_chroma_api", version = "0.1" }
 bevy_mod_chroma_request_lib = { path = "crates/bevy_mod_chroma_request_lib", version = "0.1" }
 
-bevy = { version = "^0.10" }
+bevy = "^0.10"
 
 [workspace.dependencies]
+bevy = "^0.10"
 bytes = "^1.4"
 serde_json = "^1"
 serde = { version = "^1", features = [ "derive" ] }
 reqwest = { version = "^0.11", features = [ "json" ] }
 crossbeam-channel = "^0.5"
-bevy = "^0.10"
 url = "^2.3"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies.bevy]
