@@ -1,8 +1,17 @@
-use bevy::prelude::Resource;
+use std::time::Duration;
+
+use api::Effect;
+use bevy::{
+    ecs::system::SystemParam,
+    prelude::{Commands, Entity, Resource},
+    utils::Instant,
+};
+use plugin::ApplyEffectRequest;
 use reqwest::Url;
 use serde::Serialize;
 
-mod api;
+pub mod api;
+pub mod bgr_color;
 mod heartbeat;
 mod plugin;
 
@@ -13,6 +22,41 @@ pub struct ChromaPlugin {
 impl ChromaPlugin {
     pub fn new(settings: ChromaRunnerInitializationSettings) -> Self {
         Self { settings }
+    }
+}
+
+#[derive(SystemParam)]
+pub struct Chroma<'w, 's> {
+    commands: Commands<'w, 's>,
+}
+
+impl<'w, 's> Chroma<'w, 's> {
+    pub fn create_effect(&mut self, effect: Effect) -> EffectHandle {
+        EffectHandle {
+            entity: self.commands.spawn(effect).id(),
+        }
+    }
+
+    pub fn apply_effect_with_deadline(&mut self, effect_handle: &EffectHandle, deadline: Instant) {
+        self.commands.spawn(ApplyEffectRequest {
+            effect_entity: effect_handle.entity(),
+            deadline,
+        });
+    }
+
+    pub fn apply_effect(&mut self, effect_handle: &EffectHandle) {
+        self.apply_effect_with_deadline(effect_handle, Instant::now() + Duration::from_secs(60));
+    }
+}
+
+#[derive(Debug)]
+pub struct EffectHandle {
+    entity: Entity,
+}
+
+impl EffectHandle {
+    pub fn entity(&self) -> Entity {
+        self.entity
     }
 }
 
