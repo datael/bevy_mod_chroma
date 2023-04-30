@@ -1,7 +1,9 @@
 use std::time::Duration;
 
 use bevy::{
-    prelude::{resource_exists, App, Condition, IntoSystemConfig, Plugin, Res, ResMut, Resource},
+    prelude::{
+        resource_exists, App, Commands, Component, Condition, IntoSystemConfig, Plugin, Query, Res,
+    },
     time::common_conditions::on_timer,
     utils::Instant,
 };
@@ -18,17 +20,15 @@ pub(crate) struct HeartbeatPlugin;
 
 impl Plugin for HeartbeatPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<InFlightHeartbeatRequests>()
-            .add_system(
-                system_heartbeat_keepalive.run_if(
-                    resource_exists::<ChromaRunner>()
-                        .and_then(on_timer(Duration::from_secs_f32(HEARTBEAT_INTERVAL))),
-                ),
-            )
-            .add_system(
-                system_heartbeat_cleanup
-                    .run_if(on_timer(Duration::from_secs_f32(HEARTBEAT_INTERVAL))),
-            );
+        app.add_system(
+            system_heartbeat_keepalive.run_if(
+                resource_exists::<ChromaRunner>()
+                    .and_then(on_timer(Duration::from_secs_f32(HEARTBEAT_INTERVAL))),
+            ),
+        )
+        .add_system(
+            system_heartbeat_cleanup.run_if(on_timer(Duration::from_secs_f32(HEARTBEAT_INTERVAL))),
+        );
     }
 }
 
@@ -41,9 +41,7 @@ pub(crate) struct HeartbeatResponse {
     _tick: u32,
 }
 
-#[derive(Resource, Default)]
-struct InFlightHeartbeatRequests(Vec<InFlightHeartbeatRequest>);
-
+#[derive(Component)]
 struct InFlightHeartbeatRequest {
     spawned_at: Instant,
     request_handle: Option<HttpRequestHandle>,
@@ -56,34 +54,35 @@ impl InFlightHeartbeatRequest {
 }
 
 fn system_heartbeat_keepalive(
+    mut commands: Commands,
     mut requests: HttpRequests,
-    mut in_flight_requests: ResMut<InFlightHeartbeatRequests>,
     runner: Res<ChromaRunner>,
 ) {
-    in_flight_requests.0.push(InFlightHeartbeatRequest {
-        spawned_at: Instant::now(),
-        request_handle: Some(
-            requests.request(
-                requests
-                    .client()
-                    .put(runner.get_session_url(HEARTBEAT_API))
-                    .json(&HeartbeatRequest),
-            ),
-        ),
-    })
+    let handle = requests.request(
+        requests
+            .client()
+            .put(runner.get_session_url(HEARTBEAT_API))
+            .json(&HeartbeatRequest),
+    );
+
+    commands
+        .entity(handle.entity())
+        .insert(InFlightHeartbeatRequest {
+            spawned_at: Instant::now(),
+            request_handle: Some(handle),
+        });
 }
 
 fn system_heartbeat_cleanup(
     mut requests: HttpRequests,
-    mut in_flight_requests: ResMut<InFlightHeartbeatRequests>,
+    mut in_flight_requests: Query<&mut InFlightHeartbeatRequest>,
 ) {
-    while let Some(in_flight_request) = in_flight_requests.0.get_mut(0) {
+    for mut in_flight_request in in_flight_requests.iter_mut() {
         if !in_flight_request.is_expired() {
-            break;
+            continue;
         }
 
         let request_handle = in_flight_request.request_handle.take().unwrap();
         requests.dispose(request_handle);
-        in_flight_requests.0.remove(0);
     }
 }
