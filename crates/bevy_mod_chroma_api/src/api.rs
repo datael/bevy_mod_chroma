@@ -1,4 +1,4 @@
-use crate::bgr_color::BGRColor;
+use crate::{bgr_color::BGRColor, key_color::KeyColor};
 use bevy::prelude::Component;
 use serde::{Deserialize, Serialize};
 
@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 #[serde(untagged)]
 pub enum Effect {
     Mouse(MouseEffect),
+    Keyboard(KeyboardEffect),
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_04_mouse.html
@@ -20,10 +21,26 @@ pub enum MouseEffect {
     Custom([[BGRColor; 7]; 9]),
 }
 
+// https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_03_keyboard.html
+#[derive(Debug, Serialize)]
+#[serde(tag = "effect", content = "param")]
+pub enum KeyboardEffect {
+    #[serde(rename(serialize = "CHROMA_NONE"))]
+    None,
+    #[serde(rename(serialize = "CHROMA_STATIC"))]
+    Static { color: BGRColor },
+    #[serde(rename(serialize = "CHROMA_CUSTOM2"))]
+    Custom2 {
+        color: [[BGRColor; 24]; 8],
+        key: [[KeyColor; 22]; 6],
+    },
+}
+
 impl Effect {
     pub(crate) fn get_api(&self) -> &'static str {
         match self {
             Effect::Mouse(_) => "mouse",
+            Effect::Keyboard(_) => "keyboard",
         }
     }
 }
