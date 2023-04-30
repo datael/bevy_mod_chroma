@@ -15,10 +15,7 @@ pub enum MouseEffect {
     #[serde(rename(serialize = "CHROMA_NONE"))]
     None,
     #[serde(rename(serialize = "CHROMA_STATIC"))]
-    Static {
-        #[serde(flatten)]
-        color: BGRColor,
-    },
+    Static { color: BGRColor },
     #[serde(rename(serialize = "CHROMA_CUSTOM2"))]
     Custom([[BGRColor; 7]; 9]),
 }
