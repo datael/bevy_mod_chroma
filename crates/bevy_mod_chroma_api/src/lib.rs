@@ -1,9 +1,13 @@
-use bevy::prelude::Resource;
+use api::Effect;
+use bevy::{
+    ecs::system::SystemParam,
+    prelude::{Commands, Entity, Resource},
+};
 use reqwest::Url;
 use serde::Serialize;
 
-mod api;
-mod bgr_color;
+pub mod api;
+pub mod bgr_color;
 mod heartbeat;
 mod plugin;
 
@@ -15,6 +19,24 @@ impl ChromaPlugin {
     pub fn new(settings: ChromaRunnerInitializationSettings) -> Self {
         Self { settings }
     }
+}
+
+#[derive(SystemParam)]
+pub struct Chroma<'w, 's> {
+    commands: Commands<'w, 's>,
+}
+
+impl<'w, 's> Chroma<'w, 's> {
+    pub fn create_effect(&mut self, effect: Effect) -> EffectHandle {
+        EffectHandle {
+            _entity: self.commands.spawn(effect).id(),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct EffectHandle {
+    _entity: Entity,
 }
 
 #[derive(Resource)]

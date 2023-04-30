@@ -1,8 +1,9 @@
 use bevy::{
     log::*,
     prelude::{
-        in_state, resource_exists, App, Commands, Condition, In, IntoPipeSystem, IntoSystemConfig,
-        Local, Plugin, Res, ResMut, State, States,
+        in_state, resource_exists, App, Commands, Component, Condition, Entity, In, IntoPipeSystem,
+        IntoSystemConfig, IntoSystemConfigs, Local, Plugin, Query, Res, ResMut, State, States,
+        Without,
     },
 };
 use bevy_mod_chroma_request_lib::{
@@ -11,8 +12,9 @@ use bevy_mod_chroma_request_lib::{
 use reqwest::Url;
 
 use crate::{
-    api::SessionInfo, heartbeat::HeartbeatPlugin, ChromaPlugin, ChromaRunner,
-    ChromaRunnerInitializationSettings,
+    api::{CreateEffectResponse, Effect, SessionInfo},
+    heartbeat::HeartbeatPlugin,
+    ChromaPlugin, ChromaRunner, ChromaRunnerInitializationSettings,
 };
 
 impl Plugin for ChromaPlugin {
@@ -26,6 +28,13 @@ impl Plugin for ChromaPlugin {
                     resource_exists::<ChromaRunnerInitializationSettings>()
                         .and_then(in_state(RunnerState::Init)),
                 ),
+            )
+            .add_systems(
+                (
+                    system_create_pending_effects,
+                    system_gather_create_effect_results,
+                )
+                    .distributive_run_if(in_state(RunnerState::Running)),
             );
     }
 }
@@ -110,5 +119,70 @@ impl From<serde_json::Error> for InitError {
 impl From<url::ParseError> for InitError {
     fn from(error: url::ParseError) -> Self {
         Self::UrlError(error)
+    }
+}
+
+#[derive(Component)]
+struct InFlightCreateEffectRequest {
+    request_handle: Option<HttpRequestHandle>,
+}
+
+#[derive(Component)]
+struct CreatedEffect {
+    id: String,
+}
+
+fn system_create_pending_effects(
+    mut commands: Commands,
+    mut requests: HttpRequests,
+    runner: Res<ChromaRunner>,
+    pending_effects: Query<
+        (Entity, &Effect),
+        (Without<InFlightCreateEffectRequest>, Without<CreatedEffect>),
+    >,
+) {
+    for (entity, effect) in pending_effects.iter() {
+        let request_handle = requests.request(
+            requests
+                .client()
+                .post(runner.get_session_url(effect.get_api()))
+                .json(effect),
+        );
+
+        commands.entity(entity).insert(InFlightCreateEffectRequest {
+            request_handle: Some(request_handle),
+        });
+    }
+}
+
+fn system_gather_create_effect_results(
+    mut commands: Commands,
+    mut requests: HttpRequests,
+    mut in_flight_create_requests: Query<
+        (Entity, &mut InFlightCreateEffectRequest),
+        Without<CreatedEffect>,
+    >,
+) {
+    for (entity, mut in_flight_request) in in_flight_create_requests.iter_mut() {
+        if let Some(result) =
+            requests.get_response(in_flight_request.request_handle.as_ref().unwrap())
+        {
+            // TODO error check result body
+            if let Ok(success_result) = result {
+                let id = success_result
+                    .json::<CreateEffectResponse>()
+                    .unwrap()
+                    .id()
+                    .into();
+
+                info!("created effect {}", id);
+                commands.entity(entity).insert(CreatedEffect { id });
+            } else {
+                error!("failed to create effect: {:?}", result);
+            }
+
+            let request_handle = in_flight_request.request_handle.take().unwrap();
+            requests.dispose(request_handle);
+        }
     }
 }

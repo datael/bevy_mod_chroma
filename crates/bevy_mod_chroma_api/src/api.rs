@@ -23,8 +23,26 @@ pub enum MouseEffect {
     Custom([[BGRColor; 7]; 9]),
 }
 
-#[derive(Debug, Serialize)]
-struct CreateMouseEffectRequest {}
+impl Effect {
+    pub(crate) fn get_api(&self) -> &'static str {
+        match self {
+            Effect::Mouse(_) => "/mouse",
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CreateEffectResponse {
+    #[serde(rename(deserialize = "result"))]
+    _result: i32, // TODO enum
+    id: String,
+}
+
+impl CreateEffectResponse {
+    pub(crate) fn id(&self) -> &str {
+        &self.id
+    }
+}
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct SessionInfo {
