@@ -26,7 +26,7 @@ pub enum MouseEffect {
 impl Effect {
     pub(crate) fn get_api(&self) -> &'static str {
         match self {
-            Effect::Mouse(_) => "/mouse",
+            Effect::Mouse(_) => "mouse",
         }
     }
 }

@@ -2,14 +2,12 @@ use bevy::{
     log::*,
     prelude::{
         in_state, resource_exists, App, Commands, Component, Condition, Entity, In, IntoPipeSystem,
-        IntoSystemConfig, IntoSystemConfigs, Local, Plugin, Query, Res, ResMut, State, States,
-        Without,
+        IntoSystemConfig, Local, Plugin, Query, Res, ResMut, State, States, Without,
     },
 };
 use bevy_mod_chroma_request_lib::{
     HttpRequestError, HttpRequestHandle, HttpRequestPlugin, HttpRequests,
 };
-use reqwest::Url;
 
 use crate::{
     api::{CreateEffectResponse, Effect, SessionInfo},
@@ -81,14 +79,20 @@ fn system_init(
     // SAFETY: init_request is always Some here as verified above
     if let Some(response) = requests.get_response(init_request.as_ref().unwrap()) {
         let session_info = response.as_ref()?.json::<SessionInfo>()?;
-        let root_url = Url::parse(session_info.root_url.as_str())?;
+        let root_url = if session_info.root_url.ends_with("/") {
+            session_info.root_url
+        } else {
+            session_info.root_url + "/"
+        };
+
+        commands.insert_resource(ChromaRunner {
+            root_url: root_url.as_str().try_into()?,
+        });
+        commands.remove_resource::<ChromaRunnerInitializationSettings>();
 
         // SAFETY: as above, init_request is always Some here
         let init_request = init_request.take().unwrap();
         requests.dispose(init_request);
-
-        commands.insert_resource(ChromaRunner { root_url });
-        commands.remove_resource::<ChromaRunnerInitializationSettings>();
 
         runner_state.0 = RunnerState::Running;
         info!("successfully opened chroma session");
