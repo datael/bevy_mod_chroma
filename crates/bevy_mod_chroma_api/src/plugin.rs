@@ -69,12 +69,14 @@ fn system_init(
         return Ok(());
     }
 
-    // SAFETY: init_request is always some here as verified above
+    // SAFETY: init_request is always Some here as verified above
     if let Some(response) = requests.get_response(init_request.as_ref().unwrap()) {
         let session_info = response.as_ref()?.json::<SessionInfo>()?;
         let root_url = Url::parse(session_info.root_url.as_str())?;
 
-        requests.dispose_option(&mut init_request);
+        // SAFETY: as above, init_request is always Some here
+        let init_request = init_request.take().unwrap();
+        requests.dispose(init_request);
 
         commands.insert_resource(ChromaRunner { root_url });
         commands.remove_resource::<ChromaRunnerInitializationSettings>();
