@@ -3,6 +3,7 @@ use reqwest::Url;
 use serde::Serialize;
 
 mod api;
+mod bgr_color;
 mod heartbeat;
 mod plugin;
 
