@@ -279,10 +279,8 @@ fn system_apply_effects_cleanup(
             requests.get_response(in_flight_request.request_handle.as_ref().unwrap())
         {
             // TODO error check result body
-            if let Ok(success_result) = result {
-                info!("successfully applied effect: {:?}", success_result);
-            } else {
-                error!("failed to apply effect: {:?}", result);
+            if let Err(err) = result {
+                error!("failed to apply effect: {:?}", err);
             }
 
             let request_handle = in_flight_request.request_handle.take().unwrap();
