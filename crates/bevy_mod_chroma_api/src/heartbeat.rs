@@ -42,16 +42,27 @@ pub(crate) struct HeartbeatResponse {
 }
 
 #[derive(Resource, Default)]
-struct InFlightHeartbeatRequests(Vec<(Instant, Option<HttpRequestHandle>)>);
+struct InFlightHeartbeatRequests(Vec<InFlightHeartbeatRequest>);
+
+struct InFlightHeartbeatRequest {
+    spawned_at: Instant,
+    request_handle: Option<HttpRequestHandle>,
+}
+
+impl InFlightHeartbeatRequest {
+    fn is_expired(&self) -> bool {
+        Instant::now().duration_since(self.spawned_at) > Duration::from_secs_f32(HEARTBEAT_TIMEOUT)
+    }
+}
 
 fn system_heartbeat_keepalive(
     mut requests: HttpRequests,
     mut in_flight_requests: ResMut<InFlightHeartbeatRequests>,
     runner: Res<ChromaRunner>,
 ) {
-    in_flight_requests.0.push((
-        Instant::now() + Duration::from_secs_f32(HEARTBEAT_TIMEOUT),
-        Some(
+    in_flight_requests.0.push(InFlightHeartbeatRequest {
+        spawned_at: Instant::now(),
+        request_handle: Some(
             requests.request(
                 requests
                     .client()
@@ -59,23 +70,20 @@ fn system_heartbeat_keepalive(
                     .json(&HeartbeatRequest),
             ),
         ),
-    ))
+    })
 }
 
 fn system_heartbeat_cleanup(
     mut requests: HttpRequests,
     mut in_flight_requests: ResMut<InFlightHeartbeatRequests>,
 ) {
-    let now = Instant::now().elapsed();
+    while let Some(in_flight_request) = in_flight_requests.0.get_mut(0) {
+        if !in_flight_request.is_expired() {
+            break;
+        }
 
-    in_flight_requests
-        .0
-        .retain_mut(|(deadline, ref mut in_flight_request)| {
-            if deadline.elapsed() < now {
-                requests.dispose_option(in_flight_request);
-                false
-            } else {
-                true
-            }
-        });
+        let request_handle = in_flight_request.request_handle.take().unwrap();
+        requests.dispose(request_handle);
+        in_flight_requests.0.remove(0);
+    }
 }
