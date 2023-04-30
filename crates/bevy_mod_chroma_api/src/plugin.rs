@@ -27,13 +27,14 @@ impl Plugin for ChromaPlugin {
                         .and_then(in_state(RunnerState::Init)),
                 ),
             )
-            .add_systems(
-                (
-                    system_create_pending_effects,
-                    system_gather_create_effect_results,
-                )
-                    .distributive_run_if(in_state(RunnerState::Running)),
-            );
+            .add_system(
+                system_create_pending_effects.run_if(
+                    resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
+                ),
+            )
+            .add_system(system_gather_create_effect_results.run_if(
+                resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
+            ));
     }
 }
 
@@ -95,7 +96,7 @@ fn system_init(
         requests.dispose(init_request);
 
         runner_state.0 = RunnerState::Running;
-        info!("successfully opened chroma session");
+        info!("successfully opened chroma session to {}", root_url);
     }
 
     return Ok(());
@@ -179,8 +180,10 @@ fn system_gather_create_effect_results(
                     .id()
                     .into();
 
-                info!("created effect {}", id);
-                commands.entity(entity).insert(CreatedEffect { id });
+                commands
+                    .entity(entity)
+                    .insert(CreatedEffect { id })
+                    .remove::<InFlightCreateEffectRequest>();
             } else {
                 error!("failed to create effect: {:?}", result);
             }
