@@ -1,8 +1,9 @@
-use api::SessionInfo;
 use bevy::prelude::Resource;
+use reqwest::Url;
 use serde::Serialize;
 
 mod api;
+mod heartbeat;
 mod plugin;
 
 pub struct ChromaPlugin {
@@ -15,9 +16,17 @@ impl ChromaPlugin {
     }
 }
 
-#[derive(Resource, Default)]
+#[derive(Resource)]
 pub struct ChromaRunner {
-    pub(crate) session_info: Option<SessionInfo>,
+    pub(crate) root_url: Url,
+}
+
+impl ChromaRunner {
+    pub(crate) fn get_session_url(&self, relative_path: &'static str) -> Url {
+        // SAFETY: This is internal to the crate, so we assume that we aren't
+        // going to be passing in bad URLs
+        self.root_url.join(relative_path).unwrap()
+    }
 }
 
 #[derive(Resource, Debug, Clone)]

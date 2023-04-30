@@ -73,13 +73,13 @@ impl HttpResponse {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum HttpRequestError {
-    RequestFailed(reqwest::Error),
+    RequestFailed(String),
 }
 
 impl From<reqwest::Error> for HttpRequestError {
     fn from(error: reqwest::Error) -> Self {
-        Self::RequestFailed(error)
+        Self::RequestFailed(format!("{error:?}"))
     }
 }
