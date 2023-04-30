@@ -1,5 +1,12 @@
 use crate::bgr_color::BGRColor;
+use bevy::prelude::Component;
 use serde::{Deserialize, Serialize};
+
+#[derive(Component, Debug, Serialize)]
+#[serde(untagged)]
+pub enum Effect {
+    Mouse(MouseEffect),
+}
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_04_mouse.html
 #[derive(Debug, Serialize)]
