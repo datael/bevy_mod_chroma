@@ -13,6 +13,7 @@ use serde::Serialize;
 pub mod api;
 pub mod bgr_color;
 mod heartbeat;
+pub mod key_color;
 mod plugin;
 
 pub struct ChromaPlugin {
