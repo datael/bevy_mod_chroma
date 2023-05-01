@@ -50,13 +50,10 @@ fn system_execute_requests(
     for (entity, mut request) in query.iter_mut() {
         let (sender, receiver) = crossbeam_channel::bounded(1);
 
-        let mut request_builder = None;
-        std::mem::swap(&mut request.builder, &mut request_builder);
-
         // SAFETY: This system is only invoked when a request builder is not
         // already in progress, and we only allow construction of a request by
         // passing in a request builder instance, so this will never be None.
-        let request_builder = request_builder.unwrap();
+        let request_builder = request.builder.take().unwrap();
 
         AsyncComputeTaskPool::get()
             .spawn(async move {

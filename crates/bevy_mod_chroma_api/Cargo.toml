@@ -1,6 +1,6 @@
 [package]
 name = "bevy_mod_chroma_api"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Chroma API lib for bevy_mod_chroma"
 keywords = [ "game", "gamedev", "bevy", "razer", "chroma" ]
@@ -13,16 +13,11 @@ license = "MIT"
 [dependencies]
 bevy_mod_chroma_request_lib.workspace = true
 
+bevy.workspace = true
 serde_json.workspace = true
 serde.workspace = true
 reqwest.workspace = true
 url.workspace = true
-
-[target.'cfg(not(target_family = "wasm"))'.dependencies]
-bevy.workspace = true
-
-[target.'cfg(target_family = "wasm")'.dependencies]
-bevy.workspace = true
 
 [dev-dependencies]
 bevy.workspace = true

@@ -8,7 +8,7 @@ use bevy_mod_chroma::{
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(MinimalPlugins)
         .add_plugin(ChromaPlugin::new(ChromaRunnerInitializationSettings::new(
             InitRequest {
                 title: "Bevy Mod Chroma Examples",
