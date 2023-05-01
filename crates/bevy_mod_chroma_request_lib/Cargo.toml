@@ -6,7 +6,6 @@ description = "Request lib for bevy_mod_chroma"
 keywords = [ "game", "gamedev", "bevy", "razer", "chroma" ]
 repository = "https://github.com/datael/bevy_mod_chroma"
 rust-version = "1.69.0"
-readme = "README.md"
 license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
