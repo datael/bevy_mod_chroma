@@ -1,6 +1,6 @@
 [package]
 name = "bevy_mod_chroma_api"
-version = "0.0.1"
+version = "0.1.0"
 edition = "2021"
 description = "Chroma API lib for bevy_mod_chroma"
 keywords = [ "game", "gamedev", "bevy", "razer", "chroma" ]
