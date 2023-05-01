@@ -1,6 +1,6 @@
 [package]
 name = "bevy_mod_chroma"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 categories = [ "games", "api-bindings" ]
 description = "A plugin for the Bevy game engine to allow control of Razer Chroma devices"
