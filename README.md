@@ -11,8 +11,8 @@ Currently only supports WASM.
 
 ## Usage
 
-You will need Razer Chroma hardware and software installed to use this plugin.<br />
-If you don't have all types of devices, [Razer also provides an emulator](https://github.com/razerofficial/ChromaEmulator) that you can use to test your effects.
+You will need Razer Chroma software installed to properly use this plugin.<br />
+If you don't have certain types of hardware devices, [Razer also provides an emulator](https://github.com/razerofficial/ChromaEmulator) that you can use to test your effects.
 
 General flow is that you need to register effects via `Chroma::create_effect` to get an `EffectHandle`, and then you can pass that handle to `Chroma::apply_effect` to apply.
 
