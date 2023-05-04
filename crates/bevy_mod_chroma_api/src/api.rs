@@ -7,6 +7,10 @@ use serde::{Deserialize, Serialize};
 pub enum Effect {
     Mouse(MouseEffect),
     Keyboard(KeyboardEffect),
+    Mousepad(MousepadEffect),
+    Headset(HeadsetEffect),
+    Keypad(KeypadEffect),
+    ChromaLink(ChromaLinkEffect),
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_04_mouse.html
@@ -29,11 +33,66 @@ pub enum KeyboardEffect {
     None,
     #[serde(rename(serialize = "CHROMA_STATIC"))]
     Static { color: BGRColor },
+    #[serde(rename(serialize = "CHROMA_CUSTOM"))]
+    Custom([[BGRColor; 22]; 6]),
     #[serde(rename(serialize = "CHROMA_CUSTOM2"))]
     Custom2 {
         color: [[BGRColor; 24]; 8],
         key: [[KeyColor; 22]; 6],
     },
+    #[serde(rename(serialize = "CHROMA_CUSTOM_KEY"))]
+    CustomKey {
+        color: [[BGRColor; 22]; 6],
+        key: [[KeyColor; 22]; 6],
+    },
+}
+
+// https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_05_mousemat.html
+#[derive(Debug, Serialize)]
+#[serde(tag = "effect", content = "param")]
+pub enum MousepadEffect {
+    #[serde(rename(serialize = "CHROMA_NONE"))]
+    None,
+    #[serde(rename(serialize = "CHROMA_STATIC"))]
+    Static { color: BGRColor },
+    #[serde(rename(serialize = "CHROMA_CUSTOM"))]
+    Custom([BGRColor; 20]),
+}
+
+// https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_06_headset.html
+#[derive(Debug, Serialize)]
+#[serde(tag = "effect", content = "param")]
+pub enum HeadsetEffect {
+    #[serde(rename(serialize = "CHROMA_NONE"))]
+    None,
+    #[serde(rename(serialize = "CHROMA_STATIC"))]
+    Static { color: BGRColor },
+    #[serde(rename(serialize = "CHROMA_CUSTOM"))]
+    Custom([BGRColor; 5]),
+}
+
+// https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_07_keypad.html
+#[derive(Debug, Serialize)]
+#[serde(tag = "effect", content = "param")]
+pub enum KeypadEffect {
+    #[serde(rename(serialize = "CHROMA_NONE"))]
+    None,
+    #[serde(rename(serialize = "CHROMA_STATIC"))]
+    Static { color: BGRColor },
+    #[serde(rename(serialize = "CHROMA_CUSTOM"))]
+    Custom([[BGRColor; 4]; 5]),
+}
+
+// https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_08_chromalink.html
+#[derive(Debug, Serialize)]
+#[serde(tag = "effect", content = "param")]
+pub enum ChromaLinkEffect {
+    #[serde(rename(serialize = "CHROMA_NONE"))]
+    None,
+    #[serde(rename(serialize = "CHROMA_STATIC"))]
+    Static { color: BGRColor },
+    #[serde(rename(serialize = "CHROMA_CUSTOM"))]
+    Custom([BGRColor; 5]),
 }
 
 impl Effect {
@@ -41,6 +100,10 @@ impl Effect {
         match self {
             Effect::Mouse(_) => "mouse",
             Effect::Keyboard(_) => "keyboard",
+            Effect::Mousepad(_) => "mousepad",
+            Effect::Headset(_) => "headset",
+            Effect::Keypad(_) => "keypad",
+            Effect::ChromaLink(_) => "chromalink",
         }
     }
 }
