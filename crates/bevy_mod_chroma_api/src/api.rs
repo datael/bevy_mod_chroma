@@ -109,7 +109,7 @@ impl Effect {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct CreateEffectResponse {
+pub(crate) struct CreateEffectResponse {
     #[serde(rename(deserialize = "result"))]
     _result: i32, // TODO enum
     id: String,
