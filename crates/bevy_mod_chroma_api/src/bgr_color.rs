@@ -10,6 +10,18 @@ impl BGRColor {
     pub fn as_u32(&self) -> u32 {
         self.0
     }
+
+    pub fn b(&self) -> u32 {
+        (self.0 & 0xff0000) >> 16
+    }
+
+    pub fn g(&self) -> u32 {
+        (self.0 & 0x00ff00) >> 8
+    }
+
+    pub fn r(&self) -> u32 {
+        self.0 & 0x0000ff
+    }
 }
 
 impl Debug for BGRColor {

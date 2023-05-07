@@ -10,6 +10,28 @@ const KEY_COLOR_MASK: u32 = 0x0100_0000;
 #[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
 pub struct KeyColor(u32);
 
+impl KeyColor {
+    pub fn as_u32(&self) -> u32 {
+        self.0
+    }
+
+    pub fn is_enabled(&self) -> bool {
+        self.0 & KEY_COLOR_MASK != 0
+    }
+
+    pub fn b(&self) -> u32 {
+        (self.0 & 0xff0000) >> 16
+    }
+
+    pub fn g(&self) -> u32 {
+        (self.0 & 0x00ff00) >> 8
+    }
+
+    pub fn r(&self) -> u32 {
+        self.0 & 0x0000ff
+    }
+}
+
 impl Debug for KeyColor {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         write!(
