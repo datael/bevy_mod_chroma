@@ -1,13 +1,13 @@
 use std::fmt::{Debug, Formatter, Result};
 
 use bevy::prelude::Color;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::bgr_color::BGRColor;
 
 const KEY_COLOR_MASK: u32 = 0x0100_0000;
 
-#[derive(Serialize, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
+#[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
 pub struct KeyColor(u32);
 
 impl Debug for KeyColor {

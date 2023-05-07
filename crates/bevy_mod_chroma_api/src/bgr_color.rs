@@ -1,9 +1,9 @@
 use std::fmt::{Debug, Formatter, Result};
 
 use bevy::prelude::Color;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
+#[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
 pub struct BGRColor(u32);
 
 impl BGRColor {
