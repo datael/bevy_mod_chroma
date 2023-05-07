@@ -2,7 +2,7 @@ use crate::{bgr_color::BGRColor, key_color::KeyColor};
 use bevy::prelude::Component;
 use serde::{Deserialize, Serialize};
 
-#[derive(Component, Debug, Serialize)]
+#[derive(Component, Debug, Serialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 #[serde(untagged)]
 pub enum Effect {
     Keyboard(KeyboardEffect),
@@ -14,9 +14,10 @@ pub enum Effect {
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_03_keyboard.html
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
 #[serde(tag = "effect", content = "param")]
 pub enum KeyboardEffect {
+    #[default]
     #[serde(rename(serialize = "CHROMA_NONE"))]
     None,
     #[serde(rename(serialize = "CHROMA_STATIC"))]
@@ -36,9 +37,10 @@ pub enum KeyboardEffect {
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_04_mouse.html
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
 #[serde(tag = "effect", content = "param")]
 pub enum MouseEffect {
+    #[default]
     #[serde(rename(serialize = "CHROMA_NONE"))]
     None,
     #[serde(rename(serialize = "CHROMA_STATIC"))]
@@ -48,9 +50,10 @@ pub enum MouseEffect {
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_05_mousemat.html
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
 #[serde(tag = "effect", content = "param")]
 pub enum MousepadEffect {
+    #[default]
     #[serde(rename(serialize = "CHROMA_NONE"))]
     None,
     #[serde(rename(serialize = "CHROMA_STATIC"))]
@@ -60,9 +63,10 @@ pub enum MousepadEffect {
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_06_headset.html
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
 #[serde(tag = "effect", content = "param")]
 pub enum HeadsetEffect {
+    #[default]
     #[serde(rename(serialize = "CHROMA_NONE"))]
     None,
     #[serde(rename(serialize = "CHROMA_STATIC"))]
@@ -72,9 +76,10 @@ pub enum HeadsetEffect {
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_07_keypad.html
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
 #[serde(tag = "effect", content = "param")]
 pub enum KeypadEffect {
+    #[default]
     #[serde(rename(serialize = "CHROMA_NONE"))]
     None,
     #[serde(rename(serialize = "CHROMA_STATIC"))]
@@ -84,9 +89,10 @@ pub enum KeypadEffect {
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_08_chromalink.html
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
 #[serde(tag = "effect", content = "param")]
 pub enum ChromaLinkEffect {
+    #[default]
     #[serde(rename(serialize = "CHROMA_NONE"))]
     None,
     #[serde(rename(serialize = "CHROMA_STATIC"))]

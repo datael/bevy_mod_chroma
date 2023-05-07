@@ -1,14 +1,28 @@
+use std::fmt::{Debug, Formatter, Result};
+
 use bevy::prelude::Color;
 use serde::Serialize;
 
 use crate::bgr_color::BGRColor;
 
-#[derive(Debug, Serialize, Clone, Copy)]
+const KEY_COLOR_MASK: u32 = 0x0100_0000;
+
+#[derive(Serialize, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
 pub struct KeyColor(u32);
+
+impl Debug for KeyColor {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(
+            f,
+            "KeyColor({:#06X}|{})",
+            self.0 & !KEY_COLOR_MASK,
+            (self.0 & KEY_COLOR_MASK) >> 24,
+        )
+    }
+}
 
 impl From<BGRColor> for KeyColor {
     fn from(color: BGRColor) -> Self {
-        const KEY_COLOR_MASK: u32 = 0x0100_0000;
         let color_value = color.as_u32();
 
         Self(KEY_COLOR_MASK | color_value)
