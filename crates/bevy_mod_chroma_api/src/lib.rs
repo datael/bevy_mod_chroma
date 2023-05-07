@@ -99,7 +99,7 @@ pub struct InitRequest {
     pub title: &'static str,
     pub description: &'static str,
     pub author: Author,
-    pub device_supported: Vec<&'static str>,
+    pub device_supported: Vec<SupportedDevice>,
     pub category: &'static str,
 }
 
@@ -107,4 +107,15 @@ pub struct InitRequest {
 pub struct Author {
     pub name: &'static str,
     pub contact: &'static str,
+}
+
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[serde(rename_all = "lowercase")]
+pub enum SupportedDevice {
+    Keyboard,
+    Mouse,
+    Mousepad,
+    Headset,
+    Keypad,
+    ChromaLink,
 }
