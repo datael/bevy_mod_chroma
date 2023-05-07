@@ -7,7 +7,7 @@ use bevy::{
     utils::Instant,
 };
 use bevy_mod_chroma_request_lib::{
-    HttpRequestError, HttpRequestHandle, HttpRequestPlugin, HttpRequests,
+    HttpRequestError, HttpRequestHandle, HttpRequestPlugin, HttpRequestSet, HttpRequests,
 };
 use serde::Serialize;
 
@@ -30,23 +30,33 @@ impl Plugin for ChromaPlugin {
                 ),
             )
             .add_system(
-                system_create_pending_effects.run_if(
-                    resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
-                ),
+                system_create_pending_effects
+                    .in_base_set(HttpRequestSet::BeforeExecuteRequests)
+                    .run_if(
+                        resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
+                    ),
             )
             .add_system(
-                system_gather_create_effect_results.run_if(
-                    resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
-                ),
+                system_gather_create_effect_results
+                    .in_base_set(HttpRequestSet::AfterGatherResponses)
+                    .run_if(
+                        resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
+                    ),
             )
             .add_system(
-                system_apply_effects.run_if(
-                    resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
-                ),
+                system_apply_effects
+                    .in_base_set(HttpRequestSet::BeforeExecuteRequests)
+                    .run_if(
+                        resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
+                    ),
             )
-            .add_system(system_apply_effects_cleanup.run_if(
-                resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
-            ));
+            .add_system(
+                system_apply_effects_cleanup
+                    .in_base_set(HttpRequestSet::AfterGatherResponses)
+                    .run_if(
+                        resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
+                    ),
+            );
     }
 }
 
