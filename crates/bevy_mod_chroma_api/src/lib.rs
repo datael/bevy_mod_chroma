@@ -8,7 +8,7 @@ use bevy::{
 };
 use plugin::ApplyEffectRequest;
 use reqwest::Url;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 pub mod api;
 pub mod bgr_color;
@@ -51,7 +51,7 @@ impl<'w, 's> Chroma<'w, 's> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub struct EffectHandle {
     entity: Entity,
 }
@@ -75,7 +75,7 @@ impl ChromaRunner {
     }
 }
 
-#[derive(Resource, Debug, Clone)]
+#[derive(Resource, Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct ChromaRunnerInitializationSettings {
     init_url: &'static str,
     init_request: InitRequest,
@@ -94,7 +94,7 @@ impl ChromaRunnerInitializationSettings {
     }
 }
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct InitRequest {
     pub title: &'static str,
     pub description: &'static str,
@@ -103,7 +103,7 @@ pub struct InitRequest {
     pub category: &'static str,
 }
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct Author {
     pub name: &'static str,
     pub contact: &'static str,
