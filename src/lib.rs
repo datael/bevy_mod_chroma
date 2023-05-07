@@ -9,3 +9,5 @@ pub use bevy_mod_chroma_api::api::Effect;
 pub use bevy_mod_chroma_api::api::{
     ChromaLinkEffect, HeadsetEffect, KeyboardEffect, KeypadEffect, MouseEffect, MousepadEffect,
 };
+
+pub use bevy_mod_chroma_api::{BGRColor, KeyColor};
