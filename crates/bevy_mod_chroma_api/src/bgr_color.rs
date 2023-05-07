@@ -1,12 +1,20 @@
-use bevy::prelude::Color;
-use serde::Serialize;
+use std::fmt::{Debug, Formatter, Result};
 
-#[derive(Debug, Serialize, Clone, Copy)]
+use bevy::prelude::Color;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
 pub struct BGRColor(u32);
 
 impl BGRColor {
     pub fn as_u32(&self) -> u32 {
         self.0
+    }
+}
+
+impl Debug for BGRColor {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(f, "BGRColor({:#06X})", self.0)
     }
 }
 
