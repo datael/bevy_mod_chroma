@@ -17,6 +17,9 @@ pub mod key_color;
 mod heartbeat;
 mod plugin;
 
+pub use bgr_color::BGRColor;
+pub use key_color::KeyColor;
+
 pub struct ChromaPlugin {
     settings: ChromaRunnerInitializationSettings,
 }
