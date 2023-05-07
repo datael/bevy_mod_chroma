@@ -102,7 +102,7 @@ fn system_init(
     // SAFETY: init_request is always Some here as verified above
     if let Some(response) = requests.get_response(init_request.as_ref().unwrap()) {
         let session_info = response.as_ref()?.json::<SessionInfo>()?;
-        let root_url = if session_info.root_url.ends_with("/") {
+        let root_url = if session_info.root_url.ends_with('/') {
             session_info.root_url
         } else {
             session_info.root_url + "/"
@@ -121,31 +121,31 @@ fn system_init(
         info!("successfully opened chroma session to {}", root_url);
     }
 
-    return Ok(());
+    Ok(())
 }
 
 #[derive(Debug)]
 enum InitError {
-    RequestError(HttpRequestError),
-    ParseError(serde_json::Error),
-    UrlError(url::ParseError),
+    Request(HttpRequestError),
+    Parse(serde_json::Error),
+    Url(url::ParseError),
 }
 
 impl From<&HttpRequestError> for InitError {
     fn from(error: &HttpRequestError) -> Self {
-        Self::RequestError(error.clone())
+        Self::Request(error.clone())
     }
 }
 
 impl From<serde_json::Error> for InitError {
     fn from(error: serde_json::Error) -> Self {
-        Self::ParseError(error)
+        Self::Parse(error)
     }
 }
 
 impl From<url::ParseError> for InitError {
     fn from(error: url::ParseError) -> Self {
-        Self::UrlError(error)
+        Self::Url(error)
     }
 }
 
@@ -159,6 +159,7 @@ struct CreatedEffect {
     id: String,
 }
 
+#[allow(clippy::type_complexity)]
 fn system_create_pending_effects(
     mut commands: Commands,
     mut requests: HttpRequests,

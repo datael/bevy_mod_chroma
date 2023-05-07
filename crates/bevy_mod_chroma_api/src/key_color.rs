@@ -68,6 +68,6 @@ impl From<Color> for KeyColor {
 
 impl From<Option<Color>> for KeyColor {
     fn from(maybe_color: Option<Color>) -> Self {
-        Self::from(maybe_color.map(|color| BGRColor::from(color)))
+        Self::from(maybe_color.map(BGRColor::from))
     }
 }

@@ -2,6 +2,7 @@ use crate::{bgr_color::BGRColor, key_color::KeyColor};
 use bevy::prelude::Component;
 use serde::{Deserialize, Serialize};
 
+#[allow(clippy::large_enum_variant)]
 #[derive(
     Component, Debug, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash,
 )]
@@ -16,6 +17,7 @@ pub enum Effect {
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_03_keyboard.html
+#[allow(clippy::large_enum_variant)]
 #[derive(
     Debug, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Default,
 )]
@@ -41,6 +43,7 @@ pub enum KeyboardEffect {
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_04_mouse.html
+#[allow(clippy::large_enum_variant)]
 #[derive(
     Debug, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Default,
 )]
@@ -56,6 +59,7 @@ pub enum MouseEffect {
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_05_mousemat.html
+#[allow(clippy::large_enum_variant)]
 #[derive(
     Debug, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Default,
 )]
@@ -71,6 +75,7 @@ pub enum MousepadEffect {
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_06_headset.html
+#[allow(clippy::large_enum_variant)]
 #[derive(
     Debug, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Default,
 )]
@@ -86,6 +91,7 @@ pub enum HeadsetEffect {
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_07_keypad.html
+#[allow(clippy::large_enum_variant)]
 #[derive(
     Debug, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Default,
 )]
@@ -101,6 +107,7 @@ pub enum KeypadEffect {
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_08_chromalink.html
+#[allow(clippy::large_enum_variant)]
 #[derive(
     Debug, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Default,
 )]
