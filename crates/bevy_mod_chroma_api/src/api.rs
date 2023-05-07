@@ -67,7 +67,7 @@ pub enum MousepadEffect {
     #[serde(rename = "CHROMA_STATIC")]
     Static { color: BGRColor },
     #[serde(rename = "CHROMA_CUSTOM")]
-    Custom([BGRColor; 20]),
+    Custom([BGRColor; 15]),
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_06_headset.html
@@ -97,7 +97,7 @@ pub enum KeypadEffect {
     #[serde(rename = "CHROMA_STATIC")]
     Static { color: BGRColor },
     #[serde(rename = "CHROMA_CUSTOM")]
-    Custom([[BGRColor; 4]; 5]),
+    Custom([[BGRColor; 5]; 4]),
 }
 
 // https://assets.razerzone.com/dev_portal/REST/html/md__r_e_s_t_external_08_chromalink.html
