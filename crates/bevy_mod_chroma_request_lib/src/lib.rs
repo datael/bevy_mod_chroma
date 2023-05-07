@@ -1,6 +1,6 @@
 use bevy::{
     ecs::system::SystemParam,
-    prelude::{Commands, Entity, Query, Res},
+    prelude::{Commands, Entity, Query, Res, SystemSet},
 };
 use bytes::Bytes;
 use plugin::{HttpRequest, HttpRequestClient, HttpResponseReceived};
@@ -8,6 +8,16 @@ use reqwest::{Client, RequestBuilder, StatusCode};
 use serde::Deserialize;
 
 mod plugin;
+
+#[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet)]
+#[system_set(base)]
+pub enum HttpRequestSet {
+    BeforeExecuteRequests,
+    ExecuteRequests,
+    AfterExecuteRequests,
+    GatherResponses,
+    AfterGatherResponses,
+}
 
 pub struct HttpRequestPlugin;
 

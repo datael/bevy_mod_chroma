@@ -1,17 +1,32 @@
 use bevy::{
-    prelude::{App, Commands, Component, Entity, Plugin, Query, Resource, Without},
+    prelude::{
+        App, Commands, Component, CoreSet, Entity, IntoSystemConfig, IntoSystemSetConfigs, Plugin,
+        Query, Resource, Without,
+    },
     tasks::AsyncComputeTaskPool,
 };
 use crossbeam_channel::Receiver;
 use reqwest::{Client, RequestBuilder};
 
-use crate::{HttpRequestError, HttpRequestPlugin, HttpResponse};
+use crate::{HttpRequestError, HttpRequestPlugin, HttpRequestSet, HttpResponse};
 
 impl Plugin for HttpRequestPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<HttpRequestClient>()
-            .add_system(system_execute_requests)
-            .add_system(system_gather_responses);
+        app.configure_sets(
+            (
+                CoreSet::PostUpdate,
+                HttpRequestSet::BeforeExecuteRequests,
+                HttpRequestSet::ExecuteRequests,
+                HttpRequestSet::AfterExecuteRequests,
+                HttpRequestSet::GatherResponses,
+                HttpRequestSet::AfterGatherResponses,
+                CoreSet::PostUpdateFlush,
+            )
+                .chain(),
+        )
+        .init_resource::<HttpRequestClient>()
+        .add_system(system_execute_requests.in_base_set(HttpRequestSet::ExecuteRequests))
+        .add_system(system_gather_responses.in_base_set(HttpRequestSet::GatherResponses));
     }
 }
 
