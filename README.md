@@ -24,7 +24,9 @@ Add the plugin to your app:
 
 ```rust
 use bevy::prelude::*;
-use bevy_mod_chroma::{Author, ChromaPlugin, ChromaRunnerInitializationSettings, InitRequest};
+use bevy_mod_chroma::{
+    Author, ChromaPlugin, ChromaRunnerInitializationSettings, InitRequest, SupportedDevice,
+};
 
 fn main() {
     App::new()
@@ -37,8 +39,8 @@ fn main() {
                     contact: "Your contact",
                 },
                 device_supported: vec![
-                    "keyboard",
-                    "mouse",
+                    SupportedDevice::Keyboard,
+                    SupportedDevice::Mouse,
                     //...
                 ],
                 category: "Category of your Bevy app goes here",
@@ -69,7 +71,6 @@ fn red_mouse(mut chroma: Chroma) {
 
 ## TODOs
 * Documentation
-* Expand API support to include all devices
 * Error handling
 * Retries
 * Reconnect after dropped connections

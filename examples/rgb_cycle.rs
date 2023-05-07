@@ -3,7 +3,7 @@ use std::time::Duration;
 use bevy::{prelude::*, time::common_conditions::on_timer, utils::HashMap};
 use bevy_mod_chroma::{
     Author, Chroma, ChromaPlugin, ChromaRunnerInitializationSettings, Effect, EffectHandle,
-    InitRequest, MouseEffect,
+    InitRequest, MouseEffect, SupportedDevice,
 };
 
 fn main() {
@@ -18,12 +18,12 @@ fn main() {
                     contact: "https://github.com/datael",
                 },
                 device_supported: vec![
-                    "keyboard",
-                    "mousepad",
-                    "mouse",
-                    "headset",
-                    "keypad",
-                    "chromalink",
+                    SupportedDevice::Keyboard,
+                    SupportedDevice::Mousepad,
+                    SupportedDevice::Mouse,
+                    SupportedDevice::Headset,
+                    SupportedDevice::Keypad,
+                    SupportedDevice::ChromaLink,
                 ],
                 category: "application",
             },
