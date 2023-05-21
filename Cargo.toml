@@ -1,6 +1,6 @@
 [package]
 name = "bevy_mod_chroma"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2021"
 categories = [ "games", "api-bindings" ]
 description = "A plugin for the Bevy game engine to allow control of Razer Chroma devices"
@@ -26,8 +26,8 @@ bevy_mod_chroma_request_lib.workspace = true
 bevy.workspace = true
 
 [workspace.dependencies]
-bevy_mod_chroma_api = { path = "crates/bevy_mod_chroma_api", version = "0.2.1" }
-bevy_mod_chroma_request_lib = { path = "crates/bevy_mod_chroma_request_lib", version = "0.2.1" }
+bevy_mod_chroma_api = { path = "crates/bevy_mod_chroma_api", version = "0.3.0" }
+bevy_mod_chroma_request_lib = { path = "crates/bevy_mod_chroma_request_lib", version = "0.3.0" }
 
 bevy = { version = "^0.10", default-features = false, features = [ "bevy_render" ] }
 bytes = "^1.4"
