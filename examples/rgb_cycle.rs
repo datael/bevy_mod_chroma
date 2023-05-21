@@ -2,8 +2,8 @@ use std::time::Duration;
 
 use bevy::{prelude::*, time::common_conditions::on_timer, utils::HashMap};
 use bevy_mod_chroma::{
-    Author, Chroma, ChromaPlugin, ChromaRunnerInitializationSettings, Effect, EffectHandle,
-    InitRequest, MouseEffect, SupportedDevice,
+    Author, Category, Chroma, ChromaPlugin, ChromaRunnerInitializationSettings, Effect,
+    EffectHandle, InitRequest, MouseEffect, SupportedDevice,
 };
 
 fn main() {
@@ -25,7 +25,7 @@ fn main() {
                     SupportedDevice::Keypad,
                     SupportedDevice::ChromaLink,
                 ],
-                category: "application",
+                category: Category::Application,
             },
         )))
         .insert_resource(EffectLibrary::default())
