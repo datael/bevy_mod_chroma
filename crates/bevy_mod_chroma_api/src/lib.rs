@@ -103,7 +103,7 @@ pub struct InitRequest {
     pub description: &'static str,
     pub author: Author,
     pub device_supported: Vec<SupportedDevice>,
-    pub category: &'static str,
+    pub category: Category,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Hash)]
@@ -121,4 +121,11 @@ pub enum SupportedDevice {
     Headset,
     Keypad,
     ChromaLink,
+}
+
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[serde(rename_all = "lowercase")]
+pub enum Category {
+    Application,
+    Game,
 }
