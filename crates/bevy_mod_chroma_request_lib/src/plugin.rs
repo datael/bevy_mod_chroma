@@ -1,3 +1,4 @@
+use async_compat::Compat;
 use bevy::{
     prelude::{
         App, Commands, Component, CoreSet, Entity, IntoSystemConfig, IntoSystemSetConfigs, Plugin,
@@ -70,24 +71,29 @@ fn system_execute_requests(
         // passing in a request builder instance, so this will never be None.
         let request_builder = request.builder.take().unwrap();
 
-        AsyncComputeTaskPool::get()
-            .spawn(async move {
-                async fn run_request(
-                    request: RequestBuilder,
-                ) -> Result<HttpResponse, HttpRequestError> {
-                    let response = request.send().await?;
-                    let status_code = response.status();
+        let task = async move {
+            async fn run_request(
+                request: RequestBuilder,
+            ) -> Result<HttpResponse, HttpRequestError> {
+                let response = request.send().await?;
+                let status_code = response.status();
 
-                    Ok(HttpResponse {
-                        status_code,
-                        body_bytes: response.bytes().await?,
-                    })
-                }
+                Ok(HttpResponse {
+                    status_code,
+                    body_bytes: response.bytes().await?,
+                })
+            }
 
-                let result = run_request(request_builder).await;
-                sender.send(result).expect("sent successfully");
-            })
-            .detach();
+            let result = run_request(request_builder).await;
+            sender.send(result).expect("sent successfully");
+        };
+
+        // For non-wasm targets, packing inside a compatability adapter is
+        // sufficient to prevent the Tokio runtime error that occurs without
+        #[cfg(not(target_family = "wasm"))]
+        let task = Compat::new(task);
+
+        AsyncComputeTaskPool::get().spawn(task).detach();
 
         commands
             .entity(entity)

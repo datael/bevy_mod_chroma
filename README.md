@@ -7,8 +7,6 @@
 
 Razer Chroma support plugin for Bevy. Uses the Razer Chroma HTTP API to communicate with the Razer Chroma system.
 
-Currently only supports WASM.
-
 ## Usage
 
 You will need Razer Chroma software installed to properly use this plugin.<br />
