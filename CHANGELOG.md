@@ -1,5 +1,20 @@
 # Changelog
 
+## Version 0.3.0 (2023-05-21)
+
+### New Features
+
+* Add non-wasm support
+    * This isn't heavily tested, but seems to be working
+
+### Breaking Changes
+
+* `category` now uses an enum `Category` instead of `str`
+
+### Internal Changes
+
+* Use `IoTaskPool` instead of `AsyncComputeTaskPool`
+
 ## Version 0.2.0 (2023-05-07)
 
 * Add support for all remaining device types and effect types
