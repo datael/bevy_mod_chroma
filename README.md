@@ -23,7 +23,7 @@ Add the plugin to your app:
 ```rust
 use bevy::prelude::*;
 use bevy_mod_chroma::{
-    Author, ChromaPlugin, ChromaRunnerInitializationSettings, InitRequest, SupportedDevice,
+    Author, Category, ChromaPlugin, ChromaRunnerInitializationSettings, InitRequest, SupportedDevice,
 };
 
 fn main() {
@@ -41,7 +41,7 @@ fn main() {
                     SupportedDevice::Mouse,
                     //...
                 ],
-                category: "Category of your Bevy app goes here",
+                category: Category::Application, // or Category::Game
             },
         )))
         //...
