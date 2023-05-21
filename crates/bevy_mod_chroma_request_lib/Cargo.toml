@@ -17,6 +17,7 @@ serde_json.workspace = true
 serde.workspace = true
 reqwest.workspace = true
 crossbeam-channel.workspace = true
+async-compat.workspace = true
 
 [dev-dependencies]
 bevy.workspace = true
