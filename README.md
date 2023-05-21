@@ -7,8 +7,6 @@
 
 Razer Chroma support plugin for Bevy. Uses the Razer Chroma HTTP API to communicate with the Razer Chroma system.
 
-Currently only supports WASM.
-
 ## Usage
 
 You will need Razer Chroma software installed to properly use this plugin.<br />
@@ -25,7 +23,7 @@ Add the plugin to your app:
 ```rust
 use bevy::prelude::*;
 use bevy_mod_chroma::{
-    Author, ChromaPlugin, ChromaRunnerInitializationSettings, InitRequest, SupportedDevice,
+    Author, Category, ChromaPlugin, ChromaRunnerInitializationSettings, InitRequest, SupportedDevice,
 };
 
 fn main() {
@@ -43,7 +41,7 @@ fn main() {
                     SupportedDevice::Mouse,
                     //...
                 ],
-                category: "Category of your Bevy app goes here",
+                category: Category::Application, // or Category::Game
             },
         )))
         //...

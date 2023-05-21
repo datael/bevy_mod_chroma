@@ -1,5 +1,5 @@
 pub use bevy_mod_chroma_api::{
-    Author, ChromaRunnerInitializationSettings, InitRequest, SupportedDevice,
+    Author, Category, ChromaRunnerInitializationSettings, InitRequest, SupportedDevice,
 };
 
 pub use bevy_mod_chroma_api::{Chroma, ChromaPlugin, EffectHandle};
