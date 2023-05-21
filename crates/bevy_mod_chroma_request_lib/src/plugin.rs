@@ -4,7 +4,7 @@ use bevy::{
         App, Commands, Component, CoreSet, Entity, IntoSystemConfig, IntoSystemSetConfigs, Plugin,
         Query, Resource, Without,
     },
-    tasks::AsyncComputeTaskPool,
+    tasks::IoTaskPool,
 };
 use crossbeam_channel::Receiver;
 use reqwest::{Client, RequestBuilder};
@@ -89,11 +89,11 @@ fn system_execute_requests(
         };
 
         // For non-wasm targets, packing inside a compatability adapter is
-        // sufficient to prevent the Tokio runtime error that occurs without
+        // sufficient to prevent the Tokio runtime error that occurs without.
         #[cfg(not(target_family = "wasm"))]
         let task = Compat::new(task);
 
-        AsyncComputeTaskPool::get().spawn(task).detach();
+        IoTaskPool::get().spawn(task).detach();
 
         commands
             .entity(entity)
