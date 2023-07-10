@@ -2,7 +2,8 @@ use std::time::Duration;
 
 use bevy::{
     prelude::{
-        resource_exists, App, Commands, Component, Condition, IntoSystemConfig, Plugin, Query, Res,
+        resource_exists, App, Commands, Component, Condition, IntoSystemConfigs, Plugin,
+        PostUpdate, Query, Res,
     },
     time::common_conditions::on_timer,
     utils::Instant,
@@ -20,14 +21,16 @@ pub(crate) struct HeartbeatPlugin;
 
 impl Plugin for HeartbeatPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(
-            system_heartbeat_keepalive.run_if(
-                resource_exists::<ChromaRunner>()
-                    .and_then(on_timer(Duration::from_secs_f32(HEARTBEAT_INTERVAL))),
+        app.add_systems(
+            PostUpdate,
+            (
+                system_heartbeat_keepalive.run_if(
+                    resource_exists::<ChromaRunner>()
+                        .and_then(on_timer(Duration::from_secs_f32(HEARTBEAT_INTERVAL))),
+                ),
+                system_heartbeat_cleanup
+                    .run_if(on_timer(Duration::from_secs_f32(HEARTBEAT_INTERVAL))),
             ),
-        )
-        .add_system(
-            system_heartbeat_cleanup.run_if(on_timer(Duration::from_secs_f32(HEARTBEAT_INTERVAL))),
         );
     }
 }
