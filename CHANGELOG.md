@@ -1,5 +1,22 @@
 # Changelog
 
+## Version 0.4.0 (2023-07-10)
+
+### New Features
+
+* Bevy v0.11 support
+* Bevy v0.10 support is still available on the `bevy_0.10` branch, but probably won't be maintained
+
+### Breaking Changes
+
+* Requests are now run in the new `ExecuteHttpRequests` schedule
+    * If you were referencing `HttpRequestSet` previously, you may need to update your initialization to ensure that your systems are added to the correct schedule
+* `EffectHandle` no longer implements `Copy` and `Clone`
+    * Since disposing of the handle causes the referenced entity to be despawned, it is unsound to copy it
+* Removed `HttpRequestHandle::entity` and `EffectHandle::entity` because they were unsound
+    * Allowing access to the entity referenced by each handle could allow it to be despawned, leaving us with a dangling handle
+* Added `#[must_use]` where relevant
+
 ## Version 0.3.0 (2023-05-21)
 
 ### New Features

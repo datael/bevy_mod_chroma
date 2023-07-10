@@ -1,16 +1,18 @@
 use bevy::{
-    ecs::system::SystemParam,
+    ecs::{schedule::ScheduleLabel, system::SystemParam},
     prelude::{Commands, Entity, Query, Res, SystemSet},
 };
 use bytes::Bytes;
 use plugin::{HttpRequest, HttpRequestClient, HttpResponseReceived};
 use reqwest::{Client, RequestBuilder, StatusCode};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 mod plugin;
 
+#[derive(Debug, Hash, PartialEq, Eq, Clone, ScheduleLabel)]
+pub struct ExecuteHttpRequests;
+
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet)]
-#[system_set(base)]
 pub enum HttpRequestSet {
     BeforeExecuteRequests,
     ExecuteRequests,
@@ -29,16 +31,19 @@ pub struct HttpRequests<'w, 's> {
 }
 
 impl<'w, 's> HttpRequests<'w, 's> {
+    #[must_use]
     pub fn client(&self) -> &Client {
         &self.client.client
     }
 
+    #[must_use]
     pub fn request(&mut self, request: RequestBuilder) -> HttpRequestHandle {
         HttpRequestHandle {
             entity: self.commands.spawn(HttpRequest::new(request)).id(),
         }
     }
 
+    #[must_use]
     pub fn get_response(
         &self,
         handle: &HttpRequestHandle,
@@ -55,15 +60,9 @@ impl<'w, 's> HttpRequests<'w, 's> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub struct HttpRequestHandle {
     entity: Entity,
-}
-
-impl HttpRequestHandle {
-    pub fn entity(&self) -> Entity {
-        self.entity
-    }
 }
 
 #[derive(Debug)]
@@ -73,14 +72,17 @@ pub struct HttpResponse {
 }
 
 impl HttpResponse {
+    #[must_use]
     pub fn body_bytes(&self) -> &Bytes {
         &self.body_bytes
     }
 
+    #[must_use]
     pub fn status_code(&self) -> StatusCode {
         self.status_code
     }
 
+    #[must_use]
     pub fn json<'de, T>(&'de self) -> Result<T, serde_json::Error>
     where
         T: Deserialize<'de>,

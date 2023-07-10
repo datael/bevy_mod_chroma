@@ -25,6 +25,7 @@ pub struct ChromaPlugin {
 }
 
 impl ChromaPlugin {
+    #[must_use]
     pub fn new(settings: ChromaRunnerInitializationSettings) -> Self {
         Self { settings }
     }
@@ -36,6 +37,7 @@ pub struct Chroma<'w, 's> {
 }
 
 impl<'w, 's> Chroma<'w, 's> {
+    #[must_use]
     pub fn create_effect(&mut self, effect: Effect) -> EffectHandle {
         EffectHandle {
             entity: self.commands.spawn(effect).id(),
@@ -44,7 +46,7 @@ impl<'w, 's> Chroma<'w, 's> {
 
     pub fn apply_effect_with_deadline(&mut self, effect_handle: &EffectHandle, deadline: Instant) {
         self.commands.spawn(ApplyEffectRequest {
-            effect_entity: effect_handle.entity(),
+            effect_entity: effect_handle.entity,
             deadline,
         });
     }
@@ -54,15 +56,9 @@ impl<'w, 's> Chroma<'w, 's> {
     }
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub struct EffectHandle {
     entity: Entity,
-}
-
-impl EffectHandle {
-    pub fn entity(&self) -> Entity {
-        self.entity
-    }
 }
 
 #[derive(Resource)]
@@ -71,6 +67,7 @@ pub struct ChromaRunner {
 }
 
 impl ChromaRunner {
+    #[must_use]
     pub(crate) fn get_session_url(&self, relative_path: &'static str) -> Url {
         // SAFETY: This is internal to the crate, so we assume that we aren't
         // going to be passing in bad URLs
@@ -85,10 +82,12 @@ pub struct ChromaRunnerInitializationSettings {
 }
 
 impl ChromaRunnerInitializationSettings {
+    #[must_use]
     pub fn new(init_request: InitRequest) -> Self {
         Self::new_with_init_url("http://localhost:54235/razer/chromasdk", init_request)
     }
 
+    #[must_use]
     pub fn new_with_init_url(init_url: &'static str, init_request: InitRequest) -> Self {
         Self {
             init_url,

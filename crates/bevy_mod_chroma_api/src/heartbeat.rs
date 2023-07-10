@@ -2,7 +2,8 @@ use std::time::Duration;
 
 use bevy::{
     prelude::{
-        resource_exists, App, Commands, Component, Condition, IntoSystemConfig, Plugin, Query, Res,
+        resource_exists, App, Commands, Component, Condition, Entity, IntoSystemConfigs, Plugin,
+        PostUpdate, Query, Res,
     },
     time::common_conditions::on_timer,
     utils::Instant,
@@ -20,14 +21,16 @@ pub(crate) struct HeartbeatPlugin;
 
 impl Plugin for HeartbeatPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(
-            system_heartbeat_keepalive.run_if(
-                resource_exists::<ChromaRunner>()
-                    .and_then(on_timer(Duration::from_secs_f32(HEARTBEAT_INTERVAL))),
+        app.add_systems(
+            PostUpdate,
+            (
+                system_heartbeat_keepalive.run_if(
+                    resource_exists::<ChromaRunner>()
+                        .and_then(on_timer(Duration::from_secs_f32(HEARTBEAT_INTERVAL))),
+                ),
+                system_heartbeat_cleanup
+                    .run_if(on_timer(Duration::from_secs_f32(HEARTBEAT_INTERVAL))),
             ),
-        )
-        .add_system(
-            system_heartbeat_cleanup.run_if(on_timer(Duration::from_secs_f32(HEARTBEAT_INTERVAL))),
         );
     }
 }
@@ -48,6 +51,7 @@ struct InFlightHeartbeatRequest {
 }
 
 impl InFlightHeartbeatRequest {
+    #[must_use]
     fn is_expired(&self) -> bool {
         Instant::now().duration_since(self.spawned_at) > Duration::from_secs_f32(HEARTBEAT_TIMEOUT)
     }
@@ -65,24 +69,24 @@ fn system_heartbeat_keepalive(
             .json(&HeartbeatRequest),
     );
 
-    commands
-        .entity(handle.entity())
-        .insert(InFlightHeartbeatRequest {
-            spawned_at: Instant::now(),
-            request_handle: Some(handle),
-        });
+    commands.spawn(InFlightHeartbeatRequest {
+        spawned_at: Instant::now(),
+        request_handle: Some(handle),
+    });
 }
 
 fn system_heartbeat_cleanup(
+    mut commands: Commands,
     mut requests: HttpRequests,
-    mut in_flight_requests: Query<&mut InFlightHeartbeatRequest>,
+    mut in_flight_requests: Query<(Entity, &mut InFlightHeartbeatRequest)>,
 ) {
-    for mut in_flight_request in in_flight_requests.iter_mut() {
+    for (entity, mut in_flight_request) in in_flight_requests.iter_mut() {
         if !in_flight_request.is_expired() {
             continue;
         }
 
         let request_handle = in_flight_request.request_handle.take().unwrap();
         requests.dispose(request_handle);
+        commands.entity(entity).despawn();
     }
 }

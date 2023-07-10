@@ -28,7 +28,7 @@ use bevy_mod_chroma::{
 
 fn main() {
     App::new()
-        .add_plugin(ChromaPlugin::new(ChromaRunnerInitializationSettings::new(
+        .add_plugins(ChromaPlugin::new(ChromaRunnerInitializationSettings::new(
             InitRequest {
                 title: "Your Bevy app title goes here",
                 description: "Your Bevy app description goes here",
@@ -66,6 +66,17 @@ fn red_mouse(mut chroma: Chroma) {
     chroma.apply_effect(&red_handle);
 }
 ```
+
+## Compatible Bevy versions
+
+The main branch is compatible with the latest Bevy release.
+
+Compatibility of `bevy_mod_chroma` versions:
+
+| `bevy_mod_chroma` branch | Compatible Bevy version |
+| ------------------------ | ----------------------- |
+| `develop`                | `0.11`                  |
+| `bevy_0.10`              | `0.10`                  |
 
 ## TODOs
 * Documentation

@@ -1,13 +1,14 @@
 use bevy::{
     log::*,
     prelude::{
-        in_state, resource_exists, App, Commands, Component, Condition, Entity, In, IntoPipeSystem,
-        IntoSystemConfig, Local, Plugin, Query, Res, ResMut, State, States, Without,
+        in_state, resource_exists, App, Commands, Component, Condition, Entity, In, IntoSystem,
+        IntoSystemConfigs, Local, NextState, Plugin, Query, Res, ResMut, States, Without,
     },
     utils::Instant,
 };
 use bevy_mod_chroma_request_lib::{
-    HttpRequestError, HttpRequestHandle, HttpRequestPlugin, HttpRequestSet, HttpRequests,
+    ExecuteHttpRequests, HttpRequestError, HttpRequestHandle, HttpRequestPlugin, HttpRequestSet,
+    HttpRequests,
 };
 use serde::Serialize;
 
@@ -21,41 +22,39 @@ impl Plugin for ChromaPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(self.settings.clone())
             .add_state::<RunnerState>()
-            .add_plugin(HttpRequestPlugin)
-            .add_plugin(HeartbeatPlugin)
-            .add_system(
-                system_init.pipe(system_init_error_handler).run_if(
-                    resource_exists::<ChromaRunnerInitializationSettings>()
-                        .and_then(in_state(RunnerState::Init)),
+            .add_plugins((HttpRequestPlugin, HeartbeatPlugin))
+            .add_systems(
+                ExecuteHttpRequests,
+                (
+                    system_init.pipe(system_init_error_handler).run_if(
+                        resource_exists::<ChromaRunnerInitializationSettings>()
+                            .and_then(in_state(RunnerState::Init)),
+                    ),
+                    system_create_pending_effects
+                        .in_set(HttpRequestSet::BeforeExecuteRequests)
+                        .run_if(
+                            resource_exists::<ChromaRunner>()
+                                .and_then(in_state(RunnerState::Running)),
+                        ),
+                    system_gather_create_effect_results
+                        .in_set(HttpRequestSet::AfterGatherResponses)
+                        .run_if(
+                            resource_exists::<ChromaRunner>()
+                                .and_then(in_state(RunnerState::Running)),
+                        ),
+                    system_apply_effects
+                        .in_set(HttpRequestSet::BeforeExecuteRequests)
+                        .run_if(
+                            resource_exists::<ChromaRunner>()
+                                .and_then(in_state(RunnerState::Running)),
+                        ),
+                    system_apply_effects_cleanup
+                        .in_set(HttpRequestSet::AfterGatherResponses)
+                        .run_if(
+                            resource_exists::<ChromaRunner>()
+                                .and_then(in_state(RunnerState::Running)),
+                        ),
                 ),
-            )
-            .add_system(
-                system_create_pending_effects
-                    .in_base_set(HttpRequestSet::BeforeExecuteRequests)
-                    .run_if(
-                        resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
-                    ),
-            )
-            .add_system(
-                system_gather_create_effect_results
-                    .in_base_set(HttpRequestSet::AfterGatherResponses)
-                    .run_if(
-                        resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
-                    ),
-            )
-            .add_system(
-                system_apply_effects
-                    .in_base_set(HttpRequestSet::BeforeExecuteRequests)
-                    .run_if(
-                        resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
-                    ),
-            )
-            .add_system(
-                system_apply_effects_cleanup
-                    .in_base_set(HttpRequestSet::AfterGatherResponses)
-                    .run_if(
-                        resource_exists::<ChromaRunner>().and_then(in_state(RunnerState::Running)),
-                    ),
             );
     }
 }
@@ -71,10 +70,10 @@ enum RunnerState {
 
 fn system_init_error_handler(
     In(result): In<Result<(), InitError>>,
-    mut runner_state: ResMut<State<RunnerState>>,
+    mut runner_state: ResMut<NextState<RunnerState>>,
 ) {
     if let Err(err) = result {
-        runner_state.0 = RunnerState::Error;
+        runner_state.set(RunnerState::Error);
         error!("failed to initialize chroma runner: {:?}", err);
     }
 }
@@ -83,7 +82,7 @@ fn system_init(
     mut commands: Commands,
     mut init_request: Local<Option<HttpRequestHandle>>,
     mut requests: HttpRequests,
-    mut runner_state: ResMut<State<RunnerState>>,
+    mut runner_state: ResMut<NextState<RunnerState>>,
     init: Res<ChromaRunnerInitializationSettings>,
 ) -> Result<(), InitError> {
     if init_request.is_none() {
@@ -117,7 +116,7 @@ fn system_init(
         let init_request = init_request.take().unwrap();
         requests.dispose(init_request);
 
-        runner_state.0 = RunnerState::Running;
+        runner_state.set(RunnerState::Running);
         info!("successfully opened chroma session to {}", root_url);
     }
 
@@ -224,6 +223,7 @@ pub(crate) struct ApplyEffectRequest {
 }
 
 impl ApplyEffectRequest {
+    #[must_use]
     pub(crate) fn is_expired(&self) -> bool {
         Instant::now() > self.deadline
     }
@@ -236,6 +236,7 @@ pub(crate) struct InFlightApplyEffectRequest {
 }
 
 impl InFlightApplyEffectRequest {
+    #[must_use]
     pub(crate) fn is_expired(&self) -> bool {
         Instant::now() > self.deadline
     }
