@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use bevy::{
     prelude::{
-        resource_exists, App, Commands, Component, Condition, IntoSystemConfigs, Plugin,
+        resource_exists, App, Commands, Component, Condition, Entity, IntoSystemConfigs, Plugin,
         PostUpdate, Query, Res,
     },
     time::common_conditions::on_timer,
@@ -68,24 +68,24 @@ fn system_heartbeat_keepalive(
             .json(&HeartbeatRequest),
     );
 
-    commands
-        .entity(handle.entity())
-        .insert(InFlightHeartbeatRequest {
-            spawned_at: Instant::now(),
-            request_handle: Some(handle),
-        });
+    commands.spawn(InFlightHeartbeatRequest {
+        spawned_at: Instant::now(),
+        request_handle: Some(handle),
+    });
 }
 
 fn system_heartbeat_cleanup(
+    mut commands: Commands,
     mut requests: HttpRequests,
-    mut in_flight_requests: Query<&mut InFlightHeartbeatRequest>,
+    mut in_flight_requests: Query<(Entity, &mut InFlightHeartbeatRequest)>,
 ) {
-    for mut in_flight_request in in_flight_requests.iter_mut() {
+    for (entity, mut in_flight_request) in in_flight_requests.iter_mut() {
         if !in_flight_request.is_expired() {
             continue;
         }
 
         let request_handle = in_flight_request.request_handle.take().unwrap();
         requests.dispose(request_handle);
+        commands.entity(entity).despawn();
     }
 }

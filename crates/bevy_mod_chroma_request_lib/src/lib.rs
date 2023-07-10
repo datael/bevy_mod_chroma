@@ -62,12 +62,6 @@ pub struct HttpRequestHandle {
     entity: Entity,
 }
 
-impl HttpRequestHandle {
-    pub fn entity(&self) -> Entity {
-        self.entity
-    }
-}
-
 #[derive(Debug)]
 pub struct HttpResponse {
     body_bytes: Bytes,
