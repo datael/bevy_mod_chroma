@@ -9,7 +9,7 @@ use bevy_mod_chroma::{
 fn main() {
     App::new()
         .add_plugins(MinimalPlugins)
-        .add_plugin(ChromaPlugin::new(ChromaRunnerInitializationSettings::new(
+        .add_plugins(ChromaPlugin::new(ChromaRunnerInitializationSettings::new(
             InitRequest {
                 title: "Bevy Mod Chroma Examples",
                 description: "Bevy Mod Chroma Examples",
@@ -29,8 +29,11 @@ fn main() {
             },
         )))
         .insert_resource(EffectLibrary::default())
-        .add_startup_system(create_effects)
-        .add_system(cycle_effects.run_if(on_timer(Duration::from_secs_f32(0.25))))
+        .add_systems(Startup, create_effects)
+        .add_systems(
+            Update,
+            cycle_effects.run_if(on_timer(Duration::from_secs_f32(0.25))),
+        )
         .run();
 }
 
