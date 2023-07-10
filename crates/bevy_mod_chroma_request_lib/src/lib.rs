@@ -1,5 +1,5 @@
 use bevy::{
-    ecs::system::SystemParam,
+    ecs::{schedule::ScheduleLabel, system::SystemParam},
     prelude::{Commands, Entity, Query, Res, SystemSet},
 };
 use bytes::Bytes;
@@ -9,8 +9,10 @@ use serde::Deserialize;
 
 mod plugin;
 
+#[derive(Debug, Hash, PartialEq, Eq, Clone, ScheduleLabel)]
+pub struct ExecuteHttpRequests;
+
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet)]
-#[system_set(base)]
 pub enum HttpRequestSet {
     BeforeExecuteRequests,
     ExecuteRequests,

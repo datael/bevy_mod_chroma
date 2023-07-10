@@ -1,33 +1,45 @@
 use async_compat::Compat;
 use bevy::{
+    app::MainScheduleOrder,
     prelude::{
-        App, Commands, Component, CoreSet, Entity, IntoSystemConfig, IntoSystemSetConfigs, Plugin,
-        Query, Resource, Without,
+        App, Commands, Component, Entity, IntoSystemConfigs, IntoSystemSetConfigs, Plugin,
+        PostUpdate, Query, Resource, Without,
     },
     tasks::IoTaskPool,
 };
 use crossbeam_channel::Receiver;
 use reqwest::{Client, RequestBuilder};
 
-use crate::{HttpRequestError, HttpRequestPlugin, HttpRequestSet, HttpResponse};
+use crate::{
+    ExecuteHttpRequests, HttpRequestError, HttpRequestPlugin, HttpRequestSet, HttpResponse,
+};
 
 impl Plugin for HttpRequestPlugin {
     fn build(&self, app: &mut App) {
+        app.init_schedule(ExecuteHttpRequests);
+
+        let mut order = app.world.resource_mut::<MainScheduleOrder>();
+        order.insert_after(PostUpdate, ExecuteHttpRequests);
+
         app.configure_sets(
+            ExecuteHttpRequests,
             (
-                CoreSet::PostUpdate,
                 HttpRequestSet::BeforeExecuteRequests,
                 HttpRequestSet::ExecuteRequests,
                 HttpRequestSet::AfterExecuteRequests,
                 HttpRequestSet::GatherResponses,
                 HttpRequestSet::AfterGatherResponses,
-                CoreSet::PostUpdateFlush,
             )
                 .chain(),
         )
-        .init_resource::<HttpRequestClient>()
-        .add_system(system_execute_requests.in_base_set(HttpRequestSet::ExecuteRequests))
-        .add_system(system_gather_responses.in_base_set(HttpRequestSet::GatherResponses));
+        .add_systems(
+            ExecuteHttpRequests,
+            (
+                system_execute_requests.in_set(HttpRequestSet::ExecuteRequests),
+                system_gather_responses.in_set(HttpRequestSet::GatherResponses),
+            ),
+        )
+        .init_resource::<HttpRequestClient>();
     }
 }
 
