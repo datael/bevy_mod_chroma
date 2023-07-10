@@ -1,4 +1,6 @@
+#[cfg(not(target_family = "wasm"))]
 use async_compat::Compat;
+
 use bevy::{
     app::MainScheduleOrder,
     prelude::{
