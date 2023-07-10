@@ -59,12 +59,6 @@ pub struct EffectHandle {
     entity: Entity,
 }
 
-impl EffectHandle {
-    pub fn entity(&self) -> Entity {
-        self.entity
-    }
-}
-
 #[derive(Resource)]
 pub struct ChromaRunner {
     pub(crate) root_url: Url,
