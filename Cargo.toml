@@ -46,6 +46,7 @@ features = [ "dynamic_linking" ]
 [target.'cfg(target_family = "wasm")'.dev-dependencies.bevy]
 version = "^0.11"
 default-features = false
+features = [ "webgl2" ]
 
 [profile.dev]
 opt-level = 1
