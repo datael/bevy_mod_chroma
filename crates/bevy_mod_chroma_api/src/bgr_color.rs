@@ -7,18 +7,22 @@ use serde::{Deserialize, Serialize};
 pub struct BGRColor(u32);
 
 impl BGRColor {
+    #[must_use]
     pub fn as_u32(&self) -> u32 {
         self.0
     }
 
+    #[must_use]
     pub fn b(&self) -> u32 {
         (self.0 & 0xff0000) >> 16
     }
 
+    #[must_use]
     pub fn g(&self) -> u32 {
         (self.0 & 0x00ff00) >> 8
     }
 
+    #[must_use]
     pub fn r(&self) -> u32 {
         self.0 & 0x0000ff
     }

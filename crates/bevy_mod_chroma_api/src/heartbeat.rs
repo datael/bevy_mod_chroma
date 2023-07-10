@@ -51,6 +51,7 @@ struct InFlightHeartbeatRequest {
 }
 
 impl InFlightHeartbeatRequest {
+    #[must_use]
     fn is_expired(&self) -> bool {
         Instant::now().duration_since(self.spawned_at) > Duration::from_secs_f32(HEARTBEAT_TIMEOUT)
     }

@@ -123,6 +123,7 @@ pub enum ChromaLinkEffect {
 }
 
 impl Effect {
+    #[must_use]
     pub(crate) fn get_api(&self) -> &'static str {
         match self {
             Effect::Keyboard(_) => "keyboard",
@@ -143,6 +144,7 @@ pub(crate) struct CreateEffectResponse {
 }
 
 impl CreateEffectResponse {
+    #[must_use]
     pub(crate) fn id(&self) -> &str {
         &self.id
     }

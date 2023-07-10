@@ -11,22 +11,27 @@ const KEY_COLOR_MASK: u32 = 0x0100_0000;
 pub struct KeyColor(u32);
 
 impl KeyColor {
+    #[must_use]
     pub fn as_u32(&self) -> u32 {
         self.0
     }
 
+    #[must_use]
     pub fn is_enabled(&self) -> bool {
         self.0 & KEY_COLOR_MASK != 0
     }
 
+    #[must_use]
     pub fn b(&self) -> u32 {
         (self.0 & 0xff0000) >> 16
     }
 
+    #[must_use]
     pub fn g(&self) -> u32 {
         (self.0 & 0x00ff00) >> 8
     }
 
+    #[must_use]
     pub fn r(&self) -> u32 {
         self.0 & 0x0000ff
     }

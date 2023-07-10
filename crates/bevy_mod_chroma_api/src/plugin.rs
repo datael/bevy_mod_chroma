@@ -223,6 +223,7 @@ pub(crate) struct ApplyEffectRequest {
 }
 
 impl ApplyEffectRequest {
+    #[must_use]
     pub(crate) fn is_expired(&self) -> bool {
         Instant::now() > self.deadline
     }
@@ -235,6 +236,7 @@ pub(crate) struct InFlightApplyEffectRequest {
 }
 
 impl InFlightApplyEffectRequest {
+    #[must_use]
     pub(crate) fn is_expired(&self) -> bool {
         Instant::now() > self.deadline
     }
