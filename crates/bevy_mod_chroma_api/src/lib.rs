@@ -56,7 +56,7 @@ impl<'w, 's> Chroma<'w, 's> {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct EffectHandle {
     entity: Entity,
 }

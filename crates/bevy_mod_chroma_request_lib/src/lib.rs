@@ -5,7 +5,7 @@ use bevy::{
 use bytes::Bytes;
 use plugin::{HttpRequest, HttpRequestClient, HttpResponseReceived};
 use reqwest::{Client, RequestBuilder, StatusCode};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 mod plugin;
 
@@ -60,7 +60,7 @@ impl<'w, 's> HttpRequests<'w, 's> {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct HttpRequestHandle {
     entity: Entity,
 }
@@ -82,7 +82,6 @@ impl HttpResponse {
         self.status_code
     }
 
-    #[must_use]
     pub fn json<'de, T>(&'de self) -> Result<T, serde_json::Error>
     where
         T: Deserialize<'de>,

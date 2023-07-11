@@ -1,5 +1,17 @@
 # Changelog
 
+## Version 0.5.0 (2023-07-11)
+
+
+### Breaking Changes
+
+* `EffectHandle` and `HttpRequestHandle` no longer implement `Serialize` and `Deserialize`
+    * Both `Serialize` and `Deserialize` provide backdoors to being able to copy a handle, so as with 0.4.0 removing `Clone` and `Copy`, `Serialize` and `Deserialize` should also not be implemented
+
+### Internal Changes
+
+* Fix some clippy warnings
+
 ## Version 0.4.0 (2023-07-10)
 
 ### New Features
