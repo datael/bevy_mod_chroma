@@ -82,7 +82,6 @@ impl HttpResponse {
         self.status_code
     }
 
-    #[must_use]
     pub fn json<'de, T>(&'de self) -> Result<T, serde_json::Error>
     where
         T: Deserialize<'de>,

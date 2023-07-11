@@ -87,7 +87,6 @@ fn system_execute_requests(
         let request_builder = request.builder.take().unwrap();
 
         let task = async move {
-            #[must_use]
             async fn run_request(
                 request: RequestBuilder,
             ) -> Result<HttpResponse, HttpRequestError> {
